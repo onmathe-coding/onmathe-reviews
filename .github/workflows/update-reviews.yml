@@ -32,10 +32,10 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Repo auschecken
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Node einrichten
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
 
@@ -60,16 +60,16 @@ jobs:
           fi
 
       - name: Pages konfigurieren
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       - name: public/ hochladen
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: public
 
       - name: Auf GitHub Pages veroeffentlichen
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Fehlgeschlagenen Abruf melden
         if: steps.fetch.outcome == 'failure'
