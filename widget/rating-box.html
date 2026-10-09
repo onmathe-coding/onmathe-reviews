@@ -1,0 +1,93 @@
+<!-- GOOGLE RATING BOX: Summary-Card (v3: Daten als statische reviews.json von GitHub Pages statt Apps Script, gemeinsamer Cache grsReviewsV6 mit dem Slider-Widget, Timeout 6 s, Retry mit Cache-Buster, Hero-Zahlen) -->
+<style>
+#grb{width:100%!important;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif!important;-webkit-font-smoothing:antialiased!important}
+#grb *,#grb *::before,#grb *::after{box-sizing:border-box!important;margin:0!important;padding:0!important}
+#grb .grb-sum{max-width:100%!important;background:rgba(248,250,252,0.8)!important;border:1px solid #f1f5f9!important;border-radius:1rem!important;padding:0 1.25rem 0.75rem!important;text-align:center!important;box-shadow:0 1px 2px rgba(0,0,0,0.03)!important;overflow:hidden!important}
+#grb .grb-livebar{display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;padding:8px 1.25rem!important;margin:0 -1.25rem 1.125rem!important;background:rgba(241,245,249,0.6)!important;border-bottom:1px solid rgba(226,232,240,0.6)!important}
+#grb .grb-livebar-dot{width:6px!important;height:6px!important;border-radius:50%!important;background:#22c55e!important;flex-shrink:0!important;animation:grbGlow 3s ease-in-out infinite!important}
+@keyframes grbGlow{0%,100%{opacity:0.45;box-shadow:0 0 0 0 rgba(34,197,94,0.2)}50%{opacity:1;box-shadow:0 0 0 3px rgba(34,197,94,0.08)}}
+#grb .grb-livebar-text{font-size:12px!important;color:#94a3b8!important;font-weight:400!important;letter-spacing:0.01em!important}
+#grb .grb-glogo{display:flex!important;align-items:center!important;justify-content:center!important;gap:0.5rem!important;margin-bottom:1rem!important}
+#grb .grb-glogo span{font-size:clamp(16px,3vw,20px)!important;font-weight:500!important;color:#64748b!important}
+#grb .grb-rrow{display:flex!important;align-items:center!important;justify-content:center!important;gap:0.5rem!important;margin-bottom:0.25rem!important;flex-wrap:wrap!important}
+#grb .grb-rnum{font-size:clamp(1.5rem,5vw,2.25rem)!important;font-weight:700!important;color:#0f172a!important}
+#grb .grb-stars{display:flex!important;gap:2px!important}
+#grb .grb-cnt{font-size:clamp(13px,2vw,16px)!important;color:#94a3b8!important}
+@media(max-width:28rem){#grb .grb-sum{padding:0 1rem 0.625rem!important}#grb .grb-livebar{margin:0 -1rem 1rem!important;padding:7px 1rem!important}#grb .grb-livebar-text{font-size:11px!important}}
+</style>
+
+<div id="grb">
+  <div class="grb-sum" id="grbContent">
+    <div class="grb-livebar"><span class="grb-livebar-dot"></span><span class="grb-livebar-text">Live aus unserem Bewertungsprofil</span></div>
+    <div class="grb-glogo">
+      <svg width="74" height="24" viewBox="0 0 74 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.24 8.19v2.46h5.88c-.18 1.38-.64 2.39-1.34 3.1-.86.86-2.2 1.8-4.54 1.8-3.62 0-6.45-2.92-6.45-6.54s2.83-6.54 6.45-6.54c1.95 0 3.38.77 4.43 1.76L15.4 2.5C13.94 1.08 11.98 0 9.24 0 4.28 0 .11 4.04.11 9s4.17 9 9.13 9c2.68 0 4.7-.88 6.28-2.52 1.62-1.62 2.13-3.91 2.13-5.75 0-.57-.04-1.1-.13-1.54H9.24z" fill="#4285F4"/><path d="M25 6.19c-3.21 0-5.83 2.44-5.83 5.81 0 3.34 2.62 5.81 5.83 5.81s5.83-2.46 5.83-5.81c0-3.37-2.62-5.81-5.83-5.81zm0 9.33c-1.76 0-3.28-1.45-3.28-3.52 0-2.09 1.52-3.52 3.28-3.52 1.76 0 3.28 1.43 3.28 3.52 0 2.07-1.52 3.52-3.28 3.52z" fill="#EA4335"/><path d="M53.58 7.49h-.09c-.57-.68-1.67-1.3-3.06-1.3C47.53 6.19 45 8.72 45 12c0 3.26 2.53 5.81 5.43 5.81 1.39 0 2.49-.62 3.06-1.32h.09v.81c0 2.22-1.19 3.41-3.1 3.41-1.56 0-2.53-1.12-2.93-2.07l-2.22.92c.64 1.54 2.33 3.43 5.15 3.43 2.99 0 5.52-1.76 5.52-6.05V6.49h-2.42v1zm-2.93 8.03c-1.76 0-3.1-1.5-3.1-3.52 0-2.05 1.34-3.52 3.1-3.52 1.74 0 3.1 1.5 3.1 3.54 0 2.02-1.37 3.5-3.1 3.5z" fill="#4285F4"/><path d="M38 6.19c-3.21 0-5.83 2.44-5.83 5.81 0 3.34 2.62 5.81 5.83 5.81s5.83-2.46 5.83-5.81c0-3.37-2.62-5.81-5.83-5.81zm0 9.33c-1.76 0-3.28-1.45-3.28-3.52 0-2.09 1.52-3.52 3.28-3.52 1.76 0 3.28 1.43 3.28 3.52 0 2.07-1.52 3.52-3.28 3.52z" fill="#FBBC05"/><path d="M58 .24h2.51v17.57H58z" fill="#34A853"/><path d="M68.26 15.52c-1.3 0-2.22-.59-2.82-1.76l7.77-3.21-.26-.66c-.48-1.3-1.96-3.7-4.97-3.7-2.99 0-5.48 2.35-5.48 5.81 0 3.26 2.46 5.81 5.76 5.81 2.66 0 4.2-1.63 4.84-2.57l-1.98-1.32c-.66.96-1.56 1.6-2.86 1.6zm-.18-7.15c1.03 0 1.91.53 2.2 1.28l-5.25 2.17c-.04-2.31 1.74-3.45 3.05-3.45z" fill="#EA4335"/></svg>
+      <span>Reviews</span>
+    </div>
+    <div class="grb-rrow" id="grbRating">
+      <span class="grb-rnum">–</span>
+      <span class="grb-stars"></span>
+      <span class="grb-cnt"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var grbUrl='https://onmathe-coding.github.io/onmathe-reviews/reviews.json'; /* GitHub Pages, befuellt alle 6 h von der GitHub Action im Repo onmathe-coding/onmathe-reviews */
+  var grbCacheKey='grsReviewsV6'; /* gleicher Cache wie das Slider-Widget: nur ein Request pro Besucher und Tag */
+  var grbCacheTtl=86400000; /* 24h */
+
+  function grbStar(on){return'<svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="'+(on?'#fbbf24':'#e2e8f0')+'" stroke="'+(on?'#fbbf24':'#e2e8f0')+'" stroke-width="0.5"/></svg>'}
+
+  function grbRender(rating,total){
+    if(!rating)return;
+    var rt=Number(rating).toFixed(1);
+    var s='';for(var i=1;i<=5;i++)s+=grbStar(i<=Math.round(rating));
+    document.getElementById('grbRating').innerHTML='<span class="grb-rnum">'+rt+'</span><span class="grb-stars">'+s+'</span><span class="grb-cnt">'+(total?'('+total+')':'')+'</span>';
+    /* Hero-Spans mitbefuellen, falls auf dieser Seite vorhanden */
+    var j,els=document.querySelectorAll('.grs-hero-rating');
+    for(j=0;j<els.length;j++)els[j].textContent=rt;
+    if(total){
+      els=document.querySelectorAll('.grs-hero-count');
+      for(j=0;j<els.length;j++)els[j].textContent=total;
+    }
+  }
+
+  function grbFetchTimeout(url,ms){
+    return new Promise(function(res,rej){
+      var done=false;
+      var t=setTimeout(function(){done=true;rej(new Error('timeout'))},ms);
+      fetch(url).then(
+        function(r){if(done)return;clearTimeout(t);res(r)},
+        function(e){if(done)return;clearTimeout(t);rej(e)}
+      );
+    });
+  }
+
+  /* Ab dem 2. Versuch mit Cache-Buster, damit keine zwischengespeicherte Fehlantwort zurueckkommt */
+  function grbLoad(attempt){
+    grbFetchTimeout(grbUrl+(attempt>1?'?r='+Date.now():''),6000)
+      .then(function(r){if(!r.ok)throw 0;return r.json()})
+      .then(function(d){
+        if(!d||!d.rating)throw 0;
+        var tt=d.total||d.user_ratings_total||null;
+        if(d.reviews&&d.reviews.length){
+          try{localStorage.setItem(grbCacheKey,JSON.stringify({t:Date.now(),rating:d.rating,total:tt,reviews:d.reviews}))}catch(e){}
+        }
+        grbRender(d.rating,tt);
+      })
+      .catch(function(){
+        if(attempt<3)setTimeout(function(){grbLoad(attempt+1)},500*attempt);
+        /* nach 3 Fehlversuchen bleibt der Strich stehen, kein kaputtes UI */
+      });
+  }
+
+  var grbCached=null;
+  try{grbCached=JSON.parse(localStorage.getItem(grbCacheKey))}catch(e){}
+  if(grbCached&&grbCached.rating&&(Date.now()-grbCached.t)<grbCacheTtl){
+    grbRender(grbCached.rating,grbCached.total);
+  }else{
+    grbLoad(1);
+  }
+})();
+</script>
