@@ -1,0 +1,78 @@
+# GRS: holt alle 6 h die Google-Bewertungen, schreibt public/reviews.json
+# und veroeffentlicht public/ ueber GitHub Pages.
+# Schlaegt der Google-Abruf fehl, bleibt die bisherige reviews.json online,
+# der Lauf wird aber rot markiert (GitHub schickt dann eine Mail).
+name: Reviews aktualisieren
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/update-reviews.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: reviews
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Repo auschecken
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Reviews von Google holen
+        id: fetch
+        continue-on-error: true
+        env:
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+        run: node scripts/update-reviews.mjs
+
+      - name: Aenderung committen
+        if: steps.fetch.outcome == 'success'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/reviews.json
+          if git diff --cached --quiet; then
+            echo 'Keine Aenderung an reviews.json'
+          else
+            git commit -m 'Reviews aktualisiert'
+            git push || (git pull --rebase && git push)
+          fi
+
+      - name: Pages konfigurieren
+        uses: actions/configure-pages@v5
+
+      - name: public/ hochladen
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Auf GitHub Pages veroeffentlichen
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Fehlgeschlagenen Abruf melden
+        if: steps.fetch.outcome == 'failure'
+        run: |
+          echo '::error::Google-Abruf fehlgeschlagen, die bisherige reviews.json bleibt online. Details im Schritt "Reviews von Google holen".'
+          exit 1
