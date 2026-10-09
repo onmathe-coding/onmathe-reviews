@@ -12,6 +12,15 @@ Backend für das Google-Bewertungs-Widget auf [onmathe.de](https://onmathe.de).
 
 Schlägt der Google-Abruf fehl, bleibt die letzte `reviews.json` online und der Lauf wird rot markiert.
 
+## Frontend
+
+`widget/` enthält den aktuellen Stand der beiden Webflow-Embeds, die diesen Endpoint nutzen:
+
+- `reviews-widget.html`: Bewertungs-Slider (Komponente „reviews-widget“, 1 s simulierter Loader)
+- `rating-box.html`: Google-Rating-Box (Komponente „reviews“)
+
+Beide teilen sich den Browser-Cache `grsReviewsV6` (24 h).
+
 ## Einrichtung
 
 - Repository-Secret `GOOGLE_PLACES_API_KEY` unter Settings → Secrets and variables → Actions
