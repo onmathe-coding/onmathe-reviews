@@ -1,0 +1,276 @@
+<!-- GOOGLE REVIEWS SLIDER: nur die Karte, ultrakompakt (v23: Daten kommen als statische reviews.json von GitHub Pages (Repo onmathe-coding/onmathe-reviews, eine GitHub Action aktualisiert sie alle 6 h), nicht mehr vom Apps Script, daher nur noch ein Request mit Timeout 6 s und bis zu 3 Versuchen; keinerlei Filterlogik im Frontend, die Auswahl (5 Sterne, Mindestlaenge, Dedupe, Sortierung) trifft das Script im Repo; das Widget rendert exakt die gelieferten Reviews, Texte dabei HTML-escaped; dezentes stilles "Live" mit gruenem Punkt direkt hinter der Zeitangabe; sobald das Widget in den Viewport scrollt, zeigt es 1 s den simulierten Loader "Bewertungen werden direkt von Google geladen", rein optisch, die Daten liegen da schon im Hintergrund bereit, danach erscheinen die Karten; ohne Titelzeile und ohne Pfeile; wechselt strikt synchron zum Tutoren-Spotlight, sobald dessen Event "om:tutorchange" eintrifft; ohne Spotlight auf der Seite laeuft der eigene 5s-Takt weiter; Schatten laufen frei aus, kompakte Karte im Seitenstil, max. 49rem zentriert, Schrift erbt von der Seite, neutrale Avatare, Text-Sterne; dazu Cache, Timeout, Retry, Fehleranzeige, Hero-Zahlen, Kartenbereich = laengste Bewertung, ohne Sliderpunkte) -->
+<style>
+/* #grs fuellt die Hoehe des Webflow-Embeds (height oder min-height), der Slider sitzt darin vertikal mittig */
+#grs{width:100%!important;height:100%!important;min-height:inherit!important;display:flex!important;flex-direction:column!important;font-family:inherit!important;-webkit-font-smoothing:antialiased!important}
+#grs *,#grs *::before,#grs *::after{box-sizing:border-box!important;margin:0!important;padding:0!important}
+#grs #grsContent{flex:1 0 auto!important;display:flex!important;flex-direction:column!important;justify-content:center!important}
+
+/* Kein Clipping: Karten- und Pfeilschatten laufen frei aus (Widget ist ohnehin auf 49rem begrenzt) */
+#grs .grs-cwrap{position:relative!important;width:100%!important;max-width:49rem!important;margin-left:auto!important;margin-right:auto!important;overflow:visible!important;flex:0 0 auto!important}
+#grs .grs-stage{position:relative!important}
+
+/* Alle Karten liegen im selben Grid-Feld: Feldhoehe = laengste Bewertung, sichtbar ist nur die aktive, jede sitzt vertikal mittig */
+#grs .grs-area{margin:0!important;display:grid!important;grid-template-columns:minmax(0,1fr)!important;position:relative!important;overflow:visible!important;width:auto!important;max-width:100%!important}
+#grs .grs-card{grid-area:1/1!important;align-self:center!important;position:relative!important;visibility:hidden!important;width:100%!important;max-width:100%!important;min-width:0!important}
+#grs .grs-card.grs-active{visibility:visible!important;animation:grsFade 0.4s ease!important}
+@keyframes grsFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+#grs .grs-ci{background:#fff!important;border:1px solid #e4e8ed!important;border-radius:1rem!important;padding:1.375rem!important;box-shadow:0 10px 30px rgba(32,43,62,0.06)!important;transition:box-shadow 0.3s!important;width:100%!important;max-width:100%!important;min-width:0!important;overflow:hidden!important;cursor:pointer!important}
+#grs .grs-ci:hover{box-shadow:0 14px 36px rgba(32,43,62,0.1)!important}
+
+#grs .grs-au{display:flex!important;align-items:center!important;gap:0.75rem!important;margin-bottom:1rem!important;position:relative!important;padding-right:4.5rem!important;min-width:0!important;max-width:100%!important}
+#grs .grs-av{width:44px!important;height:44px!important;border-radius:50%!important;object-fit:cover!important;flex-shrink:0!important;background:#eef1f5!important}
+#grs .grs-ap{width:44px!important;height:44px!important;border-radius:50%!important;flex-shrink:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:16px!important;font-weight:700!important;color:#8b93a3!important;background:#eef1f5!important}
+#grs .grs-nm{font-size:15px!important;font-weight:700!important;color:#202b3e!important;line-height:1.25!important;max-width:100%!important;display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere!important;word-break:break-word!important;text-align:left!important}
+/* Textcontainer neben dem Avatar muss schrumpfen duerfen, sonst schiebt der Name die Karte auf */
+#grs .grs-au > div{min-width:0!important;max-width:100%!important;overflow:hidden!important;text-align:left!important}
+#grs .grs-glogo{width:14px!important;height:14px!important;flex-shrink:0!important;display:inline-block!important}
+#grs .grs-dt{font-size:13px!important;color:#94a3b8!important;white-space:nowrap!important;overflow:hidden!important;text-align:left!important;display:flex!important;align-items:center!important;min-width:0!important}
+/* Stilles Live hinter der Zeitangabe: Zeitpunkt + Live erzaehlen zusammen die Frische der Bewertung */
+#grs .grs-dt-live{display:inline-flex!important;align-items:center!important;gap:4px!important;margin-left:8px!important;padding-left:8px!important;border-left:1px solid #e4e8ed!important;font-size:10.5px!important;font-weight:600!important;color:#94a3b8!important;line-height:1!important;flex-shrink:0!important}
+#grs .grs-dt-dot{width:5px!important;height:5px!important;border-radius:50%!important;background:#22c55e!important;flex-shrink:0!important}
+#grs .grs-src{position:absolute!important;top:0!important;right:0!important;display:flex!important;align-items:center!important;gap:5px!important;font-size:12px!important;color:#94a3b8!important;font-weight:400!important;white-space:nowrap!important}
+#grs .grs-src .grs-glogo{width:12px!important;height:12px!important}
+#grs .grs-cs{margin-bottom:0.75rem!important;font-size:17px!important;line-height:1!important;letter-spacing:2.5px!important}
+#grs .grs-st-on{color:#f2b01e!important}
+#grs .grs-st-off{color:#e2e8f0!important}
+#grs .grs-tx{font-size:14.5px!important;line-height:1.65!important;color:#475569!important;display:-webkit-box!important;-webkit-line-clamp:4!important;-webkit-box-orient:vertical!important;overflow:hidden!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+#grs .grs-more{display:inline-block!important;margin-top:0.5rem!important;font-size:13.5px!important;color:#94a3b8!important;font-weight:400!important;cursor:pointer!important}
+#grs .grs-more:hover{color:#64748b!important}
+
+#grs .grs-ld{text-align:center!important;padding:2rem 1rem!important;color:#94a3b8!important;font-size:15px!important;line-height:1.6!important}
+#grs .grs-sp{display:inline-block!important;width:24px!important;height:24px!important;border:3px solid #e2e8f0!important;border-top:3px solid #f97316!important;border-radius:50%!important;animation:grsSp 0.7s linear infinite!important;margin-bottom:0.75rem!important}
+@keyframes grsSp{to{transform:rotate(360deg)}}
+
+/* Popup */
+#grs .grs-overlay{display:none;position:fixed!important;top:0!important;left:0!important;width:100%!important;height:100%!important;background:rgba(0,0,0,0.4)!important;z-index:9999!important;align-items:center!important;justify-content:center!important;padding:1rem!important}
+#grs .grs-overlay.grs-open{display:flex!important}
+#grs .grs-modal{background:#fff!important;border-radius:1.125rem!important;padding:1.75rem 1.5rem!important;max-width:28rem!important;width:100%!important;max-height:80vh!important;overflow-y:auto!important;box-shadow:0 20px 60px rgba(0,0,0,0.15)!important;position:relative!important;animation:grsModalIn 0.25s ease!important}
+@keyframes grsModalIn{from{opacity:0;transform:translateY(16px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+#grs .grs-modal-close{position:absolute!important;top:12px!important;right:14px!important;width:28px!important;height:28px!important;border-radius:50%!important;background:#f1f5f9!important;border:none!important;display:flex!important;align-items:center!important;justify-content:center!important;cursor:pointer!important;transition:background 0.2s!important;z-index:5!important}
+#grs .grs-modal-close:hover{background:#e2e8f0!important}
+#grs .grs-modal-close svg{width:14px!important;height:14px!important;color:#64748b!important;stroke:currentColor!important;fill:none!important;stroke-width:2.5!important;stroke-linecap:round!important}
+/* Modal-Autorenzeile: Platz fuer Google-Label UND Close-Button, Name kuerzt statt zu ueberlappen */
+#grs .grs-modal .grs-au{margin-bottom:0.875rem!important;padding-right:7.5rem!important}
+#grs .grs-modal .grs-cs{margin-bottom:0.875rem!important;font-size:19px!important}
+#grs .grs-modal .grs-glogo{width:16px!important;height:16px!important}
+#grs .grs-modal .grs-src{right:3.25rem!important;top:4px!important;font-size:12px!important}
+#grs .grs-modal .grs-src .grs-glogo{width:16px!important;height:16px!important}
+#grs .grs-modal-text{font-size:15px!important;line-height:1.7!important;color:#374151!important;white-space:pre-wrap!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+
+@media(max-width:28rem){
+  #grs .grs-ci{padding:1rem!important}
+  #grs .grs-ap,#grs .grs-av{width:36px!important;height:36px!important}
+  #grs .grs-au{padding-right:4rem!important}
+  #grs .grs-nm{font-size:14px!important}
+  #grs .grs-dt{font-size:12px!important}
+  #grs .grs-src{font-size:11px!important}
+  #grs .grs-tx{font-size:13.5px!important}
+  #grs .grs-modal{padding:1.5rem 1.25rem!important;margin:0.5rem!important}
+  #grs .grs-modal .grs-au{padding-right:6.75rem!important}
+  #grs .grs-modal .grs-src{right:3rem!important}
+}
+</style>
+
+<div id="grs">
+  <div id="grsContent">
+    <div class="grs-ld"><div class="grs-sp"></div><div>Bewertungen werden direkt von Google geladen…</div></div>
+  </div>
+  <div class="grs-overlay" id="grsOverlay" onclick="grsCloseModal(event)">
+    <div class="grs-modal" id="grsModal"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  function starsHtml(r){
+    var on=Math.max(0,Math.min(5,Math.round(r)));
+    return '<span class="grs-st-on">'+'★'.repeat(on)+'</span><span class="grs-st-off">'+'★'.repeat(5-on)+'</span>';
+  }
+
+  /* Texte aus der API vor dem Einsetzen per innerHTML escapen, sonst koennte eine praeparierte Bewertung HTML/JS einschleusen */
+  function grsEsc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]});
+  }
+
+  /* Google's Zeitangaben in kuerzeres Format umwandeln */
+  function formatTime(s){
+    if(!s)return'';
+    var t=s.toLowerCase();
+    if(t.indexOf('letzte')>-1&&t.indexOf('woche')>-1)return'vor 1 Woche';
+    if(t.indexOf('letzte')>-1&&t.indexOf('monat')>-1)return'vor 1 Monat';
+    if(t.indexOf('letzte')>-1&&t.indexOf('jahr')>-1)return'vor 1 Jahr';
+    if(t.indexOf('gestern')>-1)return'vor 1 Tag';
+    if(t.indexOf('heute')>-1)return'heute';
+    t=t.replace(/vor einem /g,'vor 1 ').replace(/vor einer /g,'vor 1 ');
+    return t.charAt(0).toUpperCase()+t.slice(1);
+  }
+
+  /* Offizielles Google "G"-Logo */
+  var gLogo='<svg class="grs-glogo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-label="Google"><path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/><path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/><path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/></svg>';
+  var closeSvg='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+  var idx=0,autoPlay=true,total=0,timer,allReviews=[],synced=false;
+
+  function show(){
+    var cards=document.querySelectorAll('#grsCards .grs-card');
+    for(var i=0;i<cards.length;i++) cards[i].classList.toggle('grs-active',i===idx);
+  }
+  function slide(dir){if(!total)return;idx+=dir;if(idx<0)idx=total-1;if(idx>=total)idx=0;show()}
+  window.grsSlide=slide;
+
+  window.grsOpenModal=function(i){
+    var r=allReviews[i];if(!r)return;
+    var ini=grsEsc((r.author_name||'A').charAt(0).toUpperCase());
+    var hasImg=r.profile_photo_url&&r.profile_photo_url.indexOf('default')===-1;
+    var h='<div class="grs-modal-close" onclick="grsCloseModal(event,true)" role="button" tabindex="0">'+closeSvg+'</div>';
+    h+='<div class="grs-au">';
+    h+='<div class="grs-src">Google'+gLogo+'</div>';
+    h+=hasImg?'<img class="grs-av" src="'+grsEsc(r.profile_photo_url)+'" alt="">':'<div class="grs-ap">'+ini+'</div>';
+    h+='<div style="min-width:0!important;flex:1!important;overflow:hidden!important"><div class="grs-nm">'+grsEsc(r.author_name||'Anonym')+'</div>';
+    h+='<div class="grs-dt">'+grsEsc(formatTime(r.relative_time_description))+'<span class="grs-dt-live"><span class="grs-dt-dot"></span>Live</span>'+'</div></div></div>';
+    h+='<div class="grs-cs">'+starsHtml(r.rating)+'</div>';
+    h+='<div class="grs-modal-text">'+grsEsc(r.text)+'</div>';
+    document.getElementById('grsModal').innerHTML=h;
+    document.getElementById('grsOverlay').classList.add('grs-open');
+    document.body.style.overflow='hidden';autoPlay=false;
+  };
+  window.grsCloseModal=function(e,force){
+    if(force||e.target===document.getElementById('grsOverlay')){
+      document.getElementById('grsOverlay').classList.remove('grs-open');
+      document.body.style.overflow='';autoPlay=true;
+    }
+  };
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')grsCloseModal(e,true)});
+
+  function startAuto(){if(synced)return;if(timer)clearInterval(timer);timer=setInterval(function(){if(autoPlay&&!document.hidden)slide(1)},5000)}
+
+  /* Synchron zum Tutoren-Spotlight: beim ersten Event uebernimmt dessen Takt, der eigene Timer stoppt */
+  document.addEventListener('om:tutorchange',function(){
+    if(!synced){synced=true;if(timer)clearInterval(timer)}
+    if(autoPlay&&!document.hidden)slide(1);
+  });
+
+  /* Simulierter Loader, rein optisch und ohne API-Call: sobald das Widget in den Viewport scrollt, laeuft 1 s
+     der Loader "Bewertungen werden direkt von Google geladen", danach erscheinen die Karten. Die Daten selbst
+     werden schon beim Seitenstart im Hintergrund geladen (Cache oder GitHub Pages); kommen sie ausnahmsweise
+     spaeter als nach der Sekunde, erscheinen die Karten, sobald sie da sind */
+  var grsData=null,grsLoaderDone=false,grsShown=false;
+  function grsTryRender(){
+    if(grsShown||!grsData||!grsLoaderDone)return;
+    grsShown=true;
+    render(grsData);
+  }
+  function grsSetData(reviews){grsData=reviews;grsTryRender()}
+  function grsStartLoader(){setTimeout(function(){grsLoaderDone=true;grsTryRender()},1000)}
+  if('IntersectionObserver' in window){
+    var grsIo=new IntersectionObserver(function(es){
+      if(!es[0].isIntersecting)return;
+      grsIo.disconnect();
+      grsStartLoader();
+    },{threshold:0.25});
+    grsIo.observe(document.getElementById('grs'));
+  }else{grsStartLoader()}
+
+  function render(reviews){
+    var ct=document.getElementById('grsContent');
+    allReviews=reviews;total=reviews.length;
+    if(!total){ct.innerHTML='';return}
+    var h='<div class="grs-cwrap"><div class="grs-stage">';
+    h+='<div class="grs-area" id="grsCards">';
+    for(var i=0;i<total;i++){
+      var r=reviews[i];
+      var ini=grsEsc((r.author_name||'A').charAt(0).toUpperCase());
+      var hasImg=r.profile_photo_url&&r.profile_photo_url.indexOf('default')===-1;
+      h+='<div class="grs-card'+(i===0?' grs-active':'')+'">';
+      h+='<div class="grs-ci" onclick="grsOpenModal('+i+')">';
+      h+='<div class="grs-au">';
+      h+='<div class="grs-src">Google'+gLogo+'</div>';
+      h+=hasImg?'<img class="grs-av" src="'+grsEsc(r.profile_photo_url)+'" alt="">':'<div class="grs-ap">'+ini+'</div>';
+      h+='<div style="min-width:0!important;flex:1!important;overflow:hidden!important"><div class="grs-nm">'+grsEsc(r.author_name||'Anonym')+'</div>';
+      h+='<div class="grs-dt">'+grsEsc(formatTime(r.relative_time_description))+'<span class="grs-dt-live"><span class="grs-dt-dot"></span>Live</span>'+'</div></div></div>';
+      h+='<div class="grs-cs">'+starsHtml(r.rating)+'</div>';
+      h+='<div class="grs-tx">'+grsEsc(r.text)+'</div>';
+      if((r.text||'').length>120)h+='<span class="grs-more">Weiterlesen</span>';
+      h+='</div></div>';
+    }
+    h+='</div></div></div>';
+    ct.innerHTML=h;
+    startAuto();
+  }
+
+  /* ===== Laden mit Cache, Timeout, Retry und Fehleranzeige ===== */
+  /* Statische Datei auf GitHub Pages (CDN), befuellt alle 6 h von der GitHub Action im Repo onmathe-coding/onmathe-reviews */
+  var grsUrl='https://onmathe-coding.github.io/onmathe-reviews/reviews.json';
+  var grsCacheKey='grsReviewsV6'; /* Key bei jeder Aenderung am Datenformat hochzaehlen, sonst liefert der 24h-Cache den alten Stand */
+  var grsCacheTtl=86400000; /* 24h */
+
+  /* Hero-Zahlen aktualisieren: Spans mit Klasse grs-hero-rating / grs-hero-count */
+  function grsHero(rating,total){
+    var i,els;
+    if(rating){
+      els=document.querySelectorAll('.grs-hero-rating');
+      for(i=0;i<els.length;i++)els[i].textContent=Number(rating).toFixed(1).replace('.',','); /* deutsche Komma-Schreibweise */
+    }
+    if(total){
+      els=document.querySelectorAll('.grs-hero-count');
+      for(i=0;i<els.length;i++)els[i].textContent=total;
+    }
+  }
+
+  function grsSpinner(){
+    document.getElementById('grsContent').innerHTML='<div class="grs-ld"><div class="grs-sp"></div><div>Bewertungen werden direkt von Google geladen…</div></div>';
+  }
+  function grsError(){
+    document.getElementById('grsContent').innerHTML='<div class="grs-ld">Reviews konnten nicht geladen werden.<br><span class="grs-more" onclick="grsRetry()">Erneut versuchen</span></div>';
+  }
+  window.grsRetry=function(){grsSpinner();grsLoad(1)};
+
+  /* fetch mit hartem Timeout; verspaetete Antworten werden ignoriert */
+  function grsFetchTimeout(url,ms){
+    return new Promise(function(res,rej){
+      var done=false;
+      var t=setTimeout(function(){done=true;rej(new Error('timeout'))},ms);
+      fetch(url).then(
+        function(r){if(done)return;clearTimeout(t);res(r)},
+        function(e){if(done)return;clearTimeout(t);rej(e)}
+      );
+    });
+  }
+
+  /* Ein Abruf: liefert das JSON oder wirft. Ab dem 2. Versuch mit Cache-Buster, damit keine zwischengespeicherte Fehlantwort zurueckkommt */
+  function grsFetchJson(attempt){
+    return grsFetchTimeout(grsUrl+(attempt>1?'?r='+Date.now():''),6000)
+      .then(function(r){if(!r.ok)throw 0;return r.json()})
+      .then(function(d){if(!d||!d.reviews||!d.reviews.length)throw 0;return d});
+  }
+
+  function grsLoad(attempt){
+    grsFetchJson(attempt)
+      .then(function(d){
+        var grsRt=d.rating||null,grsTt=d.total||d.user_ratings_total||null;
+        try{localStorage.setItem(grsCacheKey,JSON.stringify({t:Date.now(),rating:grsRt,total:grsTt,reviews:d.reviews}))}catch(e){}
+        grsSetData(d.reviews);
+        grsHero(grsRt,grsTt);
+      })
+      .catch(function(){
+        if(attempt<3){
+          setTimeout(function(){grsLoad(attempt+1)},500*attempt);
+        }else{
+          grsError();
+        }
+      });
+  }
+
+  /* 1) Gueltiger Cache: Daten sofort bereit, kein Netzwerk noetig */
+  var grsCached=null;
+  try{grsCached=JSON.parse(localStorage.getItem(grsCacheKey))}catch(e){}
+  if(grsCached&&grsCached.reviews&&grsCached.reviews.length&&(Date.now()-grsCached.t)<grsCacheTtl){
+    grsSetData(grsCached.reviews);
+    grsHero(grsCached.rating,grsCached.total);
+  }else{
+    /* 2) Sonst direkt laden: die Hero-Zahlen oben brauchen die Daten sofort */
+    grsLoad(1);
+  }
+})();
+</script>
