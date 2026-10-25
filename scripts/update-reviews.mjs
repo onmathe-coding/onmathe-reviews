@@ -9,7 +9,11 @@
    Das Widget rendert genau das, was ankommt, und enthaelt selbst keine Filterlogik.
    Der API-Key kommt aus dem Repository-Secret GOOGLE_PLACES_API_KEY, nie aus dem Code.
    Schlaegt der Abruf fehl oder ist die Auswahl leer, bleibt die alte Datei unveraendert
-   und das Script endet mit Fehlercode (Lauf wird rot, GitHub schickt eine Mail). */
+   und das Script endet mit Fehlercode (Lauf wird rot, GitHub schickt eine Mail).
+   Seit 25.10.2026 zusaetzlich public/reviews_alle.json: alle Bewertungen dieses Laufs ohne Auswahl
+   (bis zu 10, neueste zuerst, mit author_url als festem Erkennungszeichen der Bewertenden) fuer den
+   Abgleich in der Kundenerfassung (56_Bewertung_Abgleich.gs). Geschrieben nur, wenn sich die Liste
+   aendert; das Widget nutzt diese Datei nicht. */
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
@@ -27,6 +31,7 @@ const GRS_FILL_TO    = 5;   /* Zielanzahl beim Auffuellen */
 
 /* Ausgabe */
 const GRS_OUT = fileURLToPath(new URL('../public/reviews.json', import.meta.url));
+const GRS_OUT_ALLE = fileURLToPath(new URL('../public/reviews_alle.json', import.meta.url));
 /* Spaetestens nach so vielen Tagen wird die Datei auch ohne inhaltliche Aenderung neu geschrieben.
    Der Commit haelt den Zeitplan aktiv: GitHub pausiert Zeitplaene in oeffentlichen Repos nach 60 Tagen ohne Aktivitaet */
 const GRS_HEARTBEAT_DAYS = 25;
@@ -76,6 +81,19 @@ export function GRS_select(list) {
   return good;
 }
 
+/* ===== Alle Bewertungen des Laufs ungefiltert, neueste zuerst; nur bei Aenderung schreiben ===== */
+async function GRS_writeAlle(alle, rating, total) {
+  if (!alle.length) return false;
+  const liste = alle.slice().sort((a, b) => (b.time || 0) - (a.time || 0));
+  let old = null;
+  try { old = JSON.parse(await readFile(GRS_OUT_ALLE, 'utf8')); } catch (e) { old = null; }
+  if (old && JSON.stringify([old.rating, old.total, old.reviews]) === JSON.stringify([rating, total, liste])) return false;
+  await mkdir(dirname(GRS_OUT_ALLE), { recursive: true });
+  await writeFile(GRS_OUT_ALLE, JSON.stringify({ rating: rating, total: total, updated: new Date().toISOString(), reviews: liste }, null, 2) + '\n');
+  console.log('GRS: ' + liste.length + ' Reviews ungefiltert geschrieben (reviews_alle.json)');
+  return true;
+}
+
 /* ===== Bisherige Datei lesen (fuer Vergleich und Heartbeat) ===== */
 async function GRS_readOld() {
   try { return JSON.parse(await readFile(GRS_OUT, 'utf8')); } catch (e) { return null; }
@@ -86,7 +104,7 @@ export async function GRS_main() {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY || '';
   if (!apiKey) throw new Error('GOOGLE_PLACES_API_KEY fehlt, bitte als Repository-Secret anlegen');
 
-  const merged = [], seen = new Set();
+  const merged = [], alle = [], seen = new Set();
   let rating = null, total = null, okCount = 0;
 
   for (const sort of GRS_SORTS) {
@@ -108,9 +126,19 @@ export async function GRS_main() {
         relative_time_description: r.relative_time_description,
         profile_photo_url: r.profile_photo_url
       });
+      alle.push({
+        author_name: r.author_name,
+        author_url: r.author_url || '',
+        rating: r.rating,
+        text: r.text,
+        time: r.time
+      });
     }
   }
   if (!okCount) throw new Error('kein Places-Abruf erfolgreich, alte reviews.json bleibt');
+
+  /* Ungefilterte Liste fuer die Kundenerfassung, unabhaengig von der Auswahl fuers Widget */
+  await GRS_writeAlle(alle, rating, total);
 
   const selected = GRS_select(merged);
   /* Alte Daten nie mit einer leeren Auswahl ueberschreiben */

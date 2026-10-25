@@ -4,11 +4,14 @@ Backend für das Google-Bewertungs-Widget auf [onmathe.de](https://onmathe.de).
 
 **Endpoint:** https://onmathe-coding.github.io/onmathe-reviews/reviews.json
 
+**Für die Kundenerfassung:** https://onmathe-coding.github.io/onmathe-reviews/reviews_alle.json (alle Bewertungen des letzten Abrufs ohne Auswahl, siehe unten)
+
 ## So funktioniert es
 
 1. Die GitHub Action **Reviews aktualisieren** läuft alle 6 Stunden und bei jeder Änderung am Script.
 2. `scripts/update-reviews.mjs` holt die Bewertungen über die Google Places API (zweimal: relevanteste und neueste), führt sie zusammen und wählt aus: nur 5 Sterne, mindestens 145 Zeichen, neueste zuerst. Bleiben weniger als 3, wird mit den längsten kürzeren 5-Sterne-Bewertungen (ab 50 Zeichen) auf 5 aufgefüllt.
 3. Das Ergebnis landet in `public/reviews.json` und wird über GitHub Pages ausgeliefert. Das Widget rendert genau diese Liste.
+4. Daneben schreibt das Script `public/reviews_alle.json`: alle Bewertungen des Abrufs ohne Auswahl (bis zu 10, neueste zuerst, mit `author_url`), nur wenn sich etwas ändert. Die Kundenerfassung ordnet damit neue Bewertungen den Kunden zu (`56_Bewertung_Abgleich.gs`). Das Widget nutzt diese Datei nicht.
 
 Schlägt der Google-Abruf fehl, bleibt die letzte `reviews.json` online und der Lauf wird rot markiert.
 
