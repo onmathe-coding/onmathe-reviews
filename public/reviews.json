@@ -1,9 +1,17 @@
 {
   "rating": 4.9,
-  "total": 133,
-  "user_ratings_total": 133,
-  "updated": "2026-10-25T20:46:54.554Z",
+  "total": 134,
+  "user_ratings_total": 134,
+  "updated": "2026-10-27T12:04:51.152Z",
   "reviews": [
+    {
+      "author_name": "der butz",
+      "rating": 5,
+      "text": "Großartige Nachhilfe! Der Erstkontakt lief freundlich ab, alle Infos haben wir bekommen. Preise, das genutzte Remotesystem, Stunden, alles war klar. Unsere Lehrkraft war super, die Aufgaben angepasst und der Unterrichtsstil echt abgewogen. Zu guter Letzt ist unser Kind stabil besser geworden. Vielen lieben Dank!",
+      "time": 1793098310,
+      "relative_time_description": "in der letzten Woche",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWfKFgL6oT96zjFTrMcxSzZSiHcf7jM-CwQ8brjsH9YlrGFNnig=s128-c0x00000000-cc-rp-mo"
+    },
     {
       "author_name": "Lena",
       "rating": 5,
@@ -19,14 +27,6 @@
       "time": 1790276820,
       "relative_time_description": "vor einem Monat",
       "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIQev2Yosj5Oj_EuskiDVYD0qGIfViHoEbKg48A2r5e8nNSSw=s128-c0x00000000-cc-rp-mo"
-    },
-    {
-      "author_name": "Hannah",
-      "rating": 5,
-      "text": "Ich bin schon seit einigen Jahren bei OnMathe, vor Ort wie auch online war und bin ich sehr zufrieden!\nIn den Nachhilfe Stunden kann mir Beate mit jedem Problem weiterhelfen und mit sehr guten Beispielen, die Themen nochmals individuell auf mich angepasst erklären. Der zwischenmenschliche Umgang ist zudem ausgezeichnet. Die Atmosphäre in den Stunden ist sehr angenehm und entspannt. Durch die Mathe Nachhilfe haben sich meine Noten auf jeden Fall verbessert!\nDeswegen empfehle ich OnMathe definitiv an jeden Schüler mit Problemen in Mathe weiter!",
-      "time": 1790274742,
-      "relative_time_description": "vor einem Monat",
-      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIN3O1HCd-lNYLvFmkucgzsWzlO7d0qxETtWTBmsMudOzVVEg=s128-c0x00000000-cc-rp-mo"
     },
     {
       "author_name": "Elouise Sophie",
