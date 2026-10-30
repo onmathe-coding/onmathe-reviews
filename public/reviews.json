@@ -1,9 +1,17 @@
 {
   "rating": 4.9,
-  "total": 134,
-  "user_ratings_total": 134,
-  "updated": "2026-10-29T22:42:27.582Z",
+  "total": 135,
+  "user_ratings_total": 135,
+  "updated": "2026-10-30T12:47:28.280Z",
   "reviews": [
+    {
+      "author_name": "Marco Schönberger",
+      "rating": 5,
+      "text": "Wir sind begeistert! Der Nachhilfeunterricht ist super unkompliziert, professionell und flexibel. Er hat unserer Tochter riesig geholfen. Das hat sich schnell auch in den Noten bemerkbar gemacht: Sie hat sich um 1 bis 2 Stufen verbessert 👍\nVielen Dank für die tolle und verlässliche Unterstützung – absolut empfehlenswert!",
+      "time": 1793342369,
+      "relative_time_description": "in der letzten Woche",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjXRmQUFW2L3_KZhJT-CHl64H65fYhwyktIfmUFvfd5IIyV1m4Q=s128-c0x00000000-cc-rp-mo"
+    },
     {
       "author_name": "der butz",
       "rating": 5,
@@ -19,14 +27,6 @@
       "time": 1791475644,
       "relative_time_description": "vor 3 Wochen",
       "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocKnDJLlz_fic5pIiwNSaoZ60qGUeEHv3u9RP4aeA-qzNRx6HQ=s128-c0x00000000-cc-rp-mo"
-    },
-    {
-      "author_name": "Cara",
-      "rating": 5,
-      "text": "Beate hat eine sehr nette und ruhige Art einem den Stoff beizubringen. Bin sehr zufrieden und habe mich auch gut verbessert. Sehr Empfehlenswert! ☺️",
-      "time": 1790276820,
-      "relative_time_description": "vor einem Monat",
-      "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIQev2Yosj5Oj_EuskiDVYD0qGIfViHoEbKg48A2r5e8nNSSw=s128-c0x00000000-cc-rp-mo"
     },
     {
       "author_name": "Elouise Sophie",
