@@ -1,8 +1,15 @@
 {
   "rating": 4.9,
-  "total": 135,
-  "updated": "2026-10-30T12:47:28.279Z",
+  "total": 136,
+  "updated": "2026-11-03T23:16:23.731Z",
   "reviews": [
+    {
+      "author_name": "Dijana Z.",
+      "author_url": "https://www.google.com/maps/contrib/117329859032667804475/reviews",
+      "rating": 5,
+      "text": "Wir sind mit dem Service von OnMathe bisher sehr zufrieden. Unser Sohn hat seit einem halben Jahr Nachhilfe in Mathematik und hat sich seitdem um 1 Note verbessert. Er möchte am Ende des Schuljahres gerne die \"Zwei\" erreichen. Die Kommunikation ist super, der Nachhilfelehrer Lennart zuverlässig und sehr gut.\n1000 Dank!",
+      "time": 1793714579
+    },
     {
       "author_name": "Marco Schönberger",
       "author_url": "https://www.google.com/maps/contrib/101408299211527321118/reviews",
@@ -30,13 +37,6 @@
       "rating": 5,
       "text": "Beate ist eine tolle Nachhilfelehrerin! Sie ermöglicht eine angenehme, ruhige und auch lustige Arbeitsatmosphäre. Wenn ich Dinge immer noch nicht ganz verstanden habe (obwohl sie es mir schon mehrmals erklärt hat) hat sie immer einen neuen Erklärungsansatz parat.\nSie erklärt auch die Schritte bis ins kleinste Detail, was mir noch nie bei anderen Nachhilfelehrern zuvor passiert ist.\nWas ich besonders angenehm an ihrer Nachhilfe finde, ist dass man sich nie dumm\nfühlt wenn man etwas nicht verstanden hat. Sondern sie versteht auch uns Schüler unter der Belastung unseres Alltags, was an einem schlechten Tag auch mal ganz gut tut.",
       "time": 1791475644
-    },
-    {
-      "author_name": "S W",
-      "author_url": "https://www.google.com/maps/contrib/102504327586982765469/reviews",
-      "rating": 4,
-      "text": "",
-      "time": 1790659500
     },
     {
       "author_name": "Elouise Sophie",
