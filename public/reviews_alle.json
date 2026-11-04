@@ -1,8 +1,15 @@
 {
   "rating": 4.9,
-  "total": 136,
-  "updated": "2026-11-04T06:09:38.291Z",
+  "total": 137,
+  "updated": "2026-11-04T23:37:36.418Z",
   "reviews": [
+    {
+      "author_name": "Ute Mertens",
+      "author_url": "https://www.google.com/maps/contrib/111601415178287652550/reviews",
+      "rating": 4,
+      "text": "Der Unterricht ist gut aufgebaut und hilft meinem Sohn sich in Mathe zu verbessern. Sein Lehrer Laurin erklärt alles sehr gut und ist auch flexibel darin, Lehrmethoden anzupassen. Wir sind sehr zufrieden.",
+      "time": 1793820625
+    },
     {
       "author_name": "Dijana Z.",
       "author_url": "https://www.google.com/maps/contrib/117329859032667804475/reviews",
