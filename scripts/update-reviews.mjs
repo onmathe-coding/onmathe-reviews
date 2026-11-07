@@ -13,13 +13,19 @@
    Seit 25.10.2026 zusaetzlich public/reviews_alle.json: alle Bewertungen dieses Laufs ohne Auswahl
    (bis zu 10, neueste zuerst, mit author_url als festem Erkennungszeichen der Bewertenden) fuer den
    Abgleich in der Kundenerfassung (56_Bewertung_Abgleich.gs). Geschrieben nur, wenn sich die Liste
-   aendert; das Widget nutzt diese Datei nicht. */
+   aendert; das Widget nutzt diese Datei nicht.
+   Seit 07.11.2026 (Kundenerfassung Paket 07c, Standorte) zusaetzlich das Google-Profil von Augustin Nachhilfe Heidenheim: dieselben zwei
+   Abrufe, ungefiltert in public/reviews_augustin_alle.json (Format wie reviews_alle.json, dazu standort und place_id), nur bei Aenderung.
+   Das Widget bleibt OnMathe. Schlaegt nur der Augustin-Abruf fehl, gehen die OnMathe-Dateien trotzdem raus; die Datei .augustin_fehler
+   macht den Lauf danach rot (letzter Schritt im Workflow), die bisherige Augustin-Datei bleibt online. */
 
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const GRS_PLACE_ID = 'ChIJ64cXfskXmUcRHkjn2GnPST8';
+/* Augustin Nachhilfe Heidenheim (Christianstrasse 13): Place-ID aus der Maps-Kennung 0x47991674ff10ed9f:0x50217aba06ecd98f */
+const GRS_AUGUSTIN = { place_id: 'ChIJn-0Q_3QWmUcRj9nsBrp6IVA', standort: 'Augustin Heidenheim' };
 const GRS_SORTS    = ['most_relevant', 'newest'];
 
 /* Auswahlkriterien (unveraendert aus dem bisherigen Apps Script) */
@@ -32,14 +38,16 @@ const GRS_FILL_TO    = 5;   /* Zielanzahl beim Auffuellen */
 /* Ausgabe */
 const GRS_OUT = fileURLToPath(new URL('../public/reviews.json', import.meta.url));
 const GRS_OUT_ALLE = fileURLToPath(new URL('../public/reviews_alle.json', import.meta.url));
+const GRS_OUT_AUGUSTIN = fileURLToPath(new URL('../public/reviews_augustin_alle.json', import.meta.url));
+const GRS_FEHLER_AUGUSTIN = fileURLToPath(new URL('../.augustin_fehler', import.meta.url));
 /* Spaetestens nach so vielen Tagen wird die Datei auch ohne inhaltliche Aenderung neu geschrieben.
    Der Commit haelt den Zeitplan aktiv: GitHub pausiert Zeitplaene in oeffentlichen Repos nach 60 Tagen ohne Aktivitaet */
 const GRS_HEARTBEAT_DAYS = 25;
 
 /* ===== Ein Place-Details-Abruf mit gewuenschter Sortierung, bis zu 3 Versuche ===== */
-async function GRS_fetchSorted(sort, apiKey) {
+async function GRS_fetchSorted(sort, apiKey, placeId) {
   const url = 'https://maps.googleapis.com/maps/api/place/details/json'
-    + '?place_id=' + encodeURIComponent(GRS_PLACE_ID)
+    + '?place_id=' + encodeURIComponent(placeId || GRS_PLACE_ID)
     + '&fields=reviews,rating,user_ratings_total'
     + '&language=de'
     + '&reviews_sort=' + sort
@@ -82,16 +90,60 @@ export function GRS_select(list) {
 }
 
 /* ===== Alle Bewertungen des Laufs ungefiltert, neueste zuerst; nur bei Aenderung schreiben ===== */
-async function GRS_writeAlle(alle, rating, total) {
+async function GRS_writeAlle(alle, rating, total, out, extra) {
+  out = out || GRS_OUT_ALLE;
   if (!alle.length) return false;
   const liste = alle.slice().sort((a, b) => (b.time || 0) - (a.time || 0));
   let old = null;
-  try { old = JSON.parse(await readFile(GRS_OUT_ALLE, 'utf8')); } catch (e) { old = null; }
+  try { old = JSON.parse(await readFile(out, 'utf8')); } catch (e) { old = null; }
   if (old && JSON.stringify([old.rating, old.total, old.reviews]) === JSON.stringify([rating, total, liste])) return false;
-  await mkdir(dirname(GRS_OUT_ALLE), { recursive: true });
-  await writeFile(GRS_OUT_ALLE, JSON.stringify({ rating: rating, total: total, updated: new Date().toISOString(), reviews: liste }, null, 2) + '\n');
-  console.log('GRS: ' + liste.length + ' Reviews ungefiltert geschrieben (reviews_alle.json)');
+  await mkdir(dirname(out), { recursive: true });
+  await writeFile(out, JSON.stringify(Object.assign({ rating: rating, total: total, updated: new Date().toISOString() }, extra || {}, { reviews: liste }), null, 2) + '\n');
+  console.log('GRS: ' + liste.length + ' Reviews ungefiltert geschrieben (' + out.split('/').pop() + ')');
   return true;
+}
+
+/* ===== Ein Profil abrufen (beide Sortierungen), ungefilterte Liste ===== */
+async function GRS_fetchAlle(apiKey, placeId) {
+  const alle = [], seen = new Set();
+  let rating = null, total = null, okCount = 0;
+  for (const sort of GRS_SORTS) {
+    const result = await GRS_fetchSorted(sort, apiKey, placeId);
+    if (!result) continue;
+    okCount++;
+    if (result.rating) rating = result.rating;
+    if (result.user_ratings_total) total = result.user_ratings_total;
+    for (const r of result.reviews || []) {
+      const key = (r.author_name || '') + '|' + (r.time || '');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      alle.push({ author_name: r.author_name, author_url: r.author_url || '', rating: r.rating, text: r.text, time: r.time });
+    }
+  }
+  return { ok: okCount > 0, alle: alle, rating: rating, total: total };
+}
+
+/* ===== Augustin Heidenheim: nur die ungefilterte Liste fuer die Kundenerfassung ===== */
+export async function GRS_augustin(apiKey) {
+  const r = await GRS_fetchAlle(apiKey, GRS_AUGUSTIN.place_id);
+  if (!r.ok) throw new Error('kein Places-Abruf fuer Augustin erfolgreich, alte reviews_augustin_alle.json bleibt');
+  await GRS_writeAlle(r.alle, r.rating, r.total, GRS_OUT_AUGUSTIN, { standort: GRS_AUGUSTIN.standort, place_id: GRS_AUGUSTIN.place_id });
+  return true;
+}
+
+/* ===== Gesamtlauf: OnMathe (Widget und Abgleich), dann Augustin (nur Abgleich); ein Fehler bei Augustin haelt OnMathe nicht auf ===== */
+export async function GRS_lauf() {
+  const apiKey = process.env.GOOGLE_PLACES_API_KEY || '';
+  let fehler = null;
+  try { await GRS_main(); } catch (e) { fehler = e; }
+  try { await rm(GRS_FEHLER_AUGUSTIN, { force: true }); } catch (e) { /* nichts */ }
+  if (apiKey) {
+    try { await GRS_augustin(apiKey); } catch (e) {
+      console.error('GRS: Augustin: ' + e.message);
+      await writeFile(GRS_FEHLER_AUGUSTIN, e.message + '\n');
+    }
+  }
+  if (fehler) throw fehler;
 }
 
 /* ===== Bisherige Datei lesen (fuer Vergleich und Heartbeat) ===== */
@@ -167,9 +219,9 @@ export async function GRS_main() {
   return true;
 }
 
-/* Direkt ausgefuehrt (node scripts/update-reviews.mjs): Hauptlauf starten */
+/* Direkt ausgefuehrt (node scripts/update-reviews.mjs): Gesamtlauf starten */
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  GRS_main().catch(e => {
+  GRS_lauf().catch(e => {
     console.error('GRS: ' + e.message);
     process.exit(1);
   });

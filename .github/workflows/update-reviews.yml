@@ -1,6 +1,7 @@
 # GRS: holt alle 6 h die Google-Bewertungen, schreibt public/reviews.json
 # (Auswahl fuers Widget) und public/reviews_alle.json (alle, fuer den Abgleich
-# in der Kundenerfassung) und veroeffentlicht public/ ueber GitHub Pages.
+# in der Kundenerfassung), seit 07.11.2026 auch public/reviews_augustin_alle.json
+# (Augustin Heidenheim, nur fuer den Abgleich) und veroeffentlicht public/ ueber GitHub Pages.
 # Schlaegt der Google-Abruf fehl, bleibt die bisherige reviews.json online,
 # der Lauf wird aber rot markiert (GitHub schickt dann eine Mail).
 name: Reviews aktualisieren
@@ -52,9 +53,9 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add public/reviews.json public/reviews_alle.json
+          git add public/
           if git diff --cached --quiet; then
-            echo 'Keine Aenderung an reviews.json und reviews_alle.json'
+            echo 'Keine Aenderung an den Dateien in public/'
           else
             git commit -m 'Reviews aktualisiert'
             git push || (git pull --rebase && git push)
@@ -76,4 +77,10 @@ jobs:
         if: steps.fetch.outcome == 'failure'
         run: |
           echo '::error::Google-Abruf fehlgeschlagen, die bisherige reviews.json bleibt online. Details im Schritt "Reviews von Google holen".'
+          exit 1
+
+      - name: Fehlgeschlagenen Augustin-Abruf melden
+        if: always() && hashFiles('.augustin_fehler') != ''
+        run: |
+          echo "::error::Augustin-Abruf fehlgeschlagen ($(cat .augustin_fehler)), die bisherige reviews_augustin_alle.json bleibt online."
           exit 1
