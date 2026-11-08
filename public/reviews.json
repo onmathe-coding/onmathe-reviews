@@ -1,9 +1,17 @@
 {
   "rating": 4.9,
-  "total": 137,
-  "user_ratings_total": 137,
-  "updated": "2026-11-07T19:02:22.627Z",
+  "total": 138,
+  "user_ratings_total": 138,
+  "updated": "2026-11-08T12:36:56.470Z",
   "reviews": [
+    {
+      "author_name": "Chocolate Cat",
+      "rating": 5,
+      "text": "Für mich ist meine Nachhilfelehrerin sehr gut im erklären, weil sie alles so verständlich darstellt🦋 Ich konnte alles Schritt für Schritt mit ihr durchgehen und sie hat die wichtigen Regeln/Bemerkungen daneben geschrieben. Ich bin zwar oft langsam im verstehen, das liegt in diesem Fall aber an mir.",
+      "time": 1794123747,
+      "relative_time_description": "in der letzten Woche",
+      "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjX-DXqgBBKm6dt8B0UhYpikg8RYIHs2f0QjLMztkSzIlJkvKBU=s128-c0x00000000-cc-rp-mo"
+    },
     {
       "author_name": "Dijana Z.",
       "rating": 5,

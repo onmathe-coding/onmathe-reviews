@@ -1,8 +1,15 @@
 {
   "rating": 4.9,
-  "total": 137,
-  "updated": "2026-11-04T23:37:36.418Z",
+  "total": 138,
+  "updated": "2026-11-08T12:36:56.469Z",
   "reviews": [
+    {
+      "author_name": "Chocolate Cat",
+      "author_url": "https://www.google.com/maps/contrib/113722034134451484860/reviews",
+      "rating": 5,
+      "text": "Für mich ist meine Nachhilfelehrerin sehr gut im erklären, weil sie alles so verständlich darstellt🦋 Ich konnte alles Schritt für Schritt mit ihr durchgehen und sie hat die wichtigen Regeln/Bemerkungen daneben geschrieben. Ich bin zwar oft langsam im verstehen, das liegt in diesem Fall aber an mir.",
+      "time": 1794123747
+    },
     {
       "author_name": "Ute Mertens",
       "author_url": "https://www.google.com/maps/contrib/111601415178287652550/reviews",
@@ -30,13 +37,6 @@
       "rating": 5,
       "text": "Großartige Nachhilfe! Der Erstkontakt lief freundlich ab, alle Infos haben wir bekommen. Preise, das genutzte Remotesystem, Stunden, alles war klar. Unsere Lehrkraft war super, die Aufgaben angepasst und der Unterrichtsstil echt abgewogen. Zu guter Letzt ist unser Kind stabil besser geworden. Vielen lieben Dank!",
       "time": 1793098310
-    },
-    {
-      "author_name": "Sophie Lehmann",
-      "author_url": "https://www.google.com/maps/contrib/103409658072653214088/reviews",
-      "rating": 4,
-      "text": "Die Lehrerin ist sehr toll ,man versteht endlich Mathe",
-      "time": 1791911614
     },
     {
       "author_name": "Lena",
