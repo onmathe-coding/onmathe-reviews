@@ -1,8 +1,15 @@
 {
   "rating": 4.9,
-  "total": 138,
-  "updated": "2026-11-08T12:36:56.469Z",
+  "total": 139,
+  "updated": "2026-11-10T14:47:43.118Z",
   "reviews": [
+    {
+      "author_name": "Eddy Mertens",
+      "author_url": "https://www.google.com/maps/contrib/109915781273752055915/reviews",
+      "rating": 5,
+      "text": "Ich finde die Nachhilfe bei OnMathe sehr hilfreich. Die Themen werden verständlich erklärt und man bekommt Unterstützung, wenn man etwas nicht direkt versteht. Besonders gut finde ich, dass man Fragen stellen kann und sich Zeit genommen wird, um schwierige Aufgaben gemeinsam zu lösen. Besonders gut hat mir Laurin bei meine Probleme die ich hatte geholfen.\n\nDurch die Nachhilfe kann ich meine Mathekenntnisse verbessern und fühle mich sicherer bei Klassenarbeiten. Insgesamt bin ich sehr zufrieden und kann OnMathe jedem empfehlen, der Schwierigkeiten in Mathematik hat oder sich verbessern möchte.",
+      "time": 1794315929
+    },
     {
       "author_name": "Chocolate Cat",
       "author_url": "https://www.google.com/maps/contrib/113722034134451484860/reviews",
@@ -44,13 +51,6 @@
       "rating": 5,
       "text": "Beate ist eine tolle Nachhilfelehrerin! Sie ermöglicht eine angenehme, ruhige und auch lustige Arbeitsatmosphäre. Wenn ich Dinge immer noch nicht ganz verstanden habe (obwohl sie es mir schon mehrmals erklärt hat) hat sie immer einen neuen Erklärungsansatz parat.\nSie erklärt auch die Schritte bis ins kleinste Detail, was mir noch nie bei anderen Nachhilfelehrern zuvor passiert ist.\nWas ich besonders angenehm an ihrer Nachhilfe finde, ist dass man sich nie dumm\nfühlt wenn man etwas nicht verstanden hat. Sondern sie versteht auch uns Schüler unter der Belastung unseres Alltags, was an einem schlechten Tag auch mal ganz gut tut.",
       "time": 1791475644
-    },
-    {
-      "author_name": "Hannah",
-      "author_url": "https://www.google.com/maps/contrib/118295074968803469137/reviews",
-      "rating": 5,
-      "text": "Ich bin schon seit einigen Jahren bei OnMathe, vor Ort wie auch online war und bin ich sehr zufrieden!\nIn den Nachhilfe Stunden kann mir Beate mit jedem Problem weiterhelfen und mit sehr guten Beispielen, die Themen nochmals individuell auf mich angepasst erklären. Der zwischenmenschliche Umgang ist zudem ausgezeichnet. Die Atmosphäre in den Stunden ist sehr angenehm und entspannt. Durch die Mathe Nachhilfe haben sich meine Noten auf jeden Fall verbessert!\nDeswegen empfehle ich OnMathe definitiv an jeden Schüler mit Problemen in Mathe weiter!",
-      "time": 1790274742
     },
     {
       "author_name": "Elouise Sophie",
