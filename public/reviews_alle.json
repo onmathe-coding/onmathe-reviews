@@ -1,7 +1,7 @@
 {
   "rating": 4.9,
   "total": 139,
-  "updated": "2026-11-11T06:06:14.410Z",
+  "updated": "2026-11-12T23:33:31.935Z",
   "reviews": [
     {
       "author_name": "Eddy Mertens",
@@ -46,25 +46,11 @@
       "time": 1793098310
     },
     {
-      "author_name": "Lena",
-      "author_url": "https://www.google.com/maps/contrib/113363264706762777747/reviews",
-      "rating": 5,
-      "text": "Beate ist eine tolle Nachhilfelehrerin! Sie ermöglicht eine angenehme, ruhige und auch lustige Arbeitsatmosphäre. Wenn ich Dinge immer noch nicht ganz verstanden habe (obwohl sie es mir schon mehrmals erklärt hat) hat sie immer einen neuen Erklärungsansatz parat.\nSie erklärt auch die Schritte bis ins kleinste Detail, was mir noch nie bei anderen Nachhilfelehrern zuvor passiert ist.\nWas ich besonders angenehm an ihrer Nachhilfe finde, ist dass man sich nie dumm\nfühlt wenn man etwas nicht verstanden hat. Sondern sie versteht auch uns Schüler unter der Belastung unseres Alltags, was an einem schlechten Tag auch mal ganz gut tut.",
-      "time": 1791475644
-    },
-    {
       "author_name": "Elouise Sophie",
       "author_url": "https://www.google.com/maps/contrib/114552030607883873812/reviews",
       "rating": 5,
       "text": "Sehr gute Erfahrung mit OnMathe!\nIch habe mit OnMathe sehr gute Erfahrungen gemacht. Die Nachhilfe war verständlich und gut auf meine individuellen Fragen und Schwierigkeiten abgestimmt. Dadurch konnte ich den Stoff deutlich besser verstehen und mich gezielt verbessern.\nAuch die Kommunikation war immer freundlich und unkompliziert. Insgesamt hat mir die Nachhilfe sehr weitergeholfen und ich würde OnMathe definitiv weiterempfehlen!",
       "time": 1788260504
-    },
-    {
-      "author_name": "Niclas Hockerts",
-      "author_url": "https://www.google.com/maps/contrib/112391634701603312241/reviews",
-      "rating": 5,
-      "text": "OnMathe ist eine prima Nachhilfe Plattform, alles super organisiert und top „Personal“.\nMeine Nachhilfe Lehrerin Lisa nimmt sich immer genügend Zeit einem alles ausführlich, genau und Vorallem so einfach wie möglich beizubringen.\nAuch wenn manchmal nur ein kleiner Schubser in die richtige Richtung fehlt, kommt dieser immer genau richtig.\nIch bin mit Lisa sehr zufrieden, da ich seit dem ich bei Ihr Nachhilfe habe, in einem stabilen 2er Bereich gerutscht bin und sehr zuversichtlich bin, dass ich mit Lisas Hilfe nächstes Jahr mein Abi erfolgreich abschließen werde.",
-      "time": 1776974268
     }
   ]
 }
