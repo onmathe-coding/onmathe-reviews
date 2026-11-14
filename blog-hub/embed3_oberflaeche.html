@@ -1,0 +1,725 @@
+<!-- OnMathe Blog-Hub 3/3: Oberflaeche. Liest die CMS-Liste obs-data und laedt /blog-suchindex nach. -->
+<script data-cookieconsent="ignore">
+/* OnMathe Blog-Hub /blog: liest die Beitraege aus der CMS-Liste #obs-data, laedt Abschnitte und
+   FAQ-Antworten aus /blog-suchindex nach und rendert Suche, Themenkarten und Lernpfade.
+   Faellt etwas aus, bleibt die alte Beitragsliste sichtbar. */
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  var E = window.OMBS_ENGINE, S = window.OMBS_STATIC;
+  var hub = document.getElementById('obs-hub'), dataEl = document.getElementById('obs-data');
+  function giveUp(why) { root.classList.remove('obs-on'); if (window.console) console.warn('[obs] Blog-Hub aus:', why); }
+  if (!E || !S || !hub || !dataEl || !window.fetch || !window.DOMParser || !window.Map || !window.Promise) { giveUp('Voraussetzung fehlt'); return; }
+
+  var BASE = '/blog/', CTA_URL = '/', IX_URL = '/blog-suchindex';
+  var L = E.LEVELS;
+  var CALC_RE = /rechner/i, NOCALC_RE = /taschenrechner|rechnerisch/i;
+  var GENERIC = /^(zusammenfassung|fazit|einleitung|überblick|uebersicht)$/i;
+
+  /* ---------- Daten aus dem CMS ---------- */
+  var TOPICS = S.topics.map(function (t) { return { id: t[0], name: t[1], desc: t[2], glyph: t[3] }; });
+  var OTHER = { id: 'weitere', name: 'Weitere Beiträge', desc: 'Noch keinem Thema zugeordnet', glyph: '\\ldots', other: true };
+  var byName = {};
+  TOPICS.forEach(function (t) { byName[t.name.toLowerCase()] = t; });
+
+  function readFields(el) {
+    var o = {};
+    Array.prototype.forEach.call(el.querySelectorAll('[data-k]'), function (c) { o[c.getAttribute('data-k')] = c.textContent.replace(/\s+/g, ' ').trim(); });
+    return o;
+  }
+  var articles = [], seen = {};
+  Array.prototype.forEach.call(dataEl.querySelectorAll('[data-a]'), function (el) {
+    var o = readFields(el);
+    if (!o.s || seen[o.s]) return;
+    seen[o.s] = 1;
+    var t = byName[(o.th || '').toLowerCase()], c = S.calc[o.s], ord = parseFloat(o.o);
+    articles.push({ slug: o.s, title: o.t || o.s, sub: o.u || '', desc: o.d || '', author: o.au || '',
+      topic: t ? t.id : OTHER.id, order: isFinite(ord) ? ord : 9999, level: L.indexOf(o.lv) >= 0 ? o.lv : '',
+      ref: o.r || '', kw: S.kw[o.s] || '', calc: c ? { h: c[0], anchor: c[1] } : null,
+      faqCount: S.faq[o.s] || 0, clicks: S.clicks[o.s] || 0 });
+  });
+  if (!articles.length) { giveUp('keine Beiträge in #obs-data'); return; }
+  var refToSlug = {};
+  articles.forEach(function (a) { if (a.ref) refToSlug[a.ref] = a.slug; });
+
+  function computeTopics() {
+    var list = TOPICS.concat([OTHER]).map(function (t) {
+      var arts = articles.filter(function (a) { return a.topic === t.id; });
+      var lv = L.filter(function (l) { return arts.some(function (a) { return a.level === l; }); });
+      return { id: t.id, name: t.name, desc: t.desc, glyph: t.glyph, other: !!t.other, count: arts.length, levels: lv,
+        calcCount: arts.filter(function (a) { return a.calc; }).length };
+    });
+    return list.filter(function (t) { return t.count > 0; });
+  }
+  var DATA = { articles: articles, sections: [], answers: [], topics: computeTopics(),
+    popular: S.popular.filter(function (s) { return seen[s]; }) };
+  var IX = E.build(DATA), art = IX.art, topicById = IX.topic;
+  var ixReady = false, ixPromise = null;
+
+  /* ---------- Antwort-Auszug aus dem FAQ-HTML (wie im Prototyp) ---------- */
+  var ta = document.createElement('textarea');
+  function decode(s) { ta.innerHTML = s; return ta.value; }
+  function escText(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var DROP = /<(script|style|svg)\b[^>]*>[\s\S]*?<\/\1>/gi;
+  function text(h) { return decode(String(h || '').replace(DROP, ' ').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim(); }
+  function inline(h) {
+    h = String(h || '').replace(DROP, ' ').replace(/<(strong|b)\b[^>]*>/gi, '\u0001').replace(/<\/(strong|b)>/gi, '\u0002').replace(/<[^>]+>/g, ' ');
+    h = escText(decode(h).replace(/\s+/g, ' ').trim());
+    return h.replace(/\u0001/g, '<strong>').replace(/\u0002/g, '</strong>');
+  }
+  var MATH = /(\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\])/;
+  function tidy(s) {
+    var parts = s.split(MATH);
+    for (var i = 0; i < parts.length; i += 2) parts[i] = parts[i].replace(/\s+([.,:;!?])/g, '$1');
+    s = parts.join('').trim();
+    if (/:$/.test(s)) {
+      var cutAt = Math.max(s.lastIndexOf('. '), s.lastIndexOf('! '), s.lastIndexOf('? '));
+      if (cutAt > 0) s = s.slice(0, cutAt + 1);
+    }
+    return s;
+  }
+  function count(s, sub) { return s.split(sub).length - 1; }
+  function cut(s, limit) {
+    limit = limit || 300;
+    if (text(s).length <= limit) return s;
+    var re = /[.!?](?=\s)/g, m, best = 0;
+    while ((m = re.exec(s))) {
+      var pos = m.index + 1, before = s.slice(0, pos);
+      if (count(before, '\\(') !== count(before, '\\)')) continue;
+      if (text(before).length <= limit) best = pos; else break;
+    }
+    return best ? s.slice(0, best) : s;
+  }
+  function excerpt(body) {
+    body = body || '';
+    var re = /<p\b[^>]*>([\s\S]*?)<\/p>/gi, paras = [], m;
+    while ((m = re.exec(body))) paras.push({ inner: m[1], end: m.index + m[0].length });
+    if (!paras.length) return cut(inline(body));
+    var first = inline(paras[0].inner);
+    if (!/:\s*$/.test(first)) return cut(first, 320);
+    var rest = body.slice(paras[0].end), nxt = rest.replace(/^\s+/, ''), uptoP = rest.split(/<p\b/i)[0];
+    if (/^<div class="(?:formula|rechnung)/.test(nxt)) {
+      var lines = [], lm, lre = /\\\(([\s\S]*?)\\\)/g;
+      while ((lm = lre.exec(uptoP)) && lines.length < 3) lines.push(lm[1].trim());
+      var out = first + lines.map(function (l) { return ' \\[' + l + '\\]'; }).join('');
+      if (paras.length > 1) out += ' ' + cut(inline(paras[1].inner), 160);
+      return out;
+    }
+    if (/^<(div class="points"|ul|ol)/.test(nxt)) {
+      var pts = [], pm, pre = /<(?:div class="point"|li)\b[^>]*>([\s\S]*?)<\/(?:div|li)>/g;
+      while ((pm = pre.exec(uptoP)) && pts.length < 2) pts.push(pm[1]);
+      if (pts.length) return first + ' ' + pts.map(function (p) { return cut(inline(p), 150); }).join(' ');
+    }
+    var sentences = first.replace(/([.!?])\s+/g, '$1\u0000').split('\u0000');
+    var kept = sentences.filter(function (x) { return !/:\s*$/.test(x); });
+    return kept.length ? cut(kept.join(' '), 320) : first.replace(/:\s*$/, '') + ' …';
+  }
+
+  /* ---------- Suchindex nachladen (Abschnitte und FAQ) ---------- */
+  function fetchDoc(u) {
+    return fetch(u, { credentials: 'same-origin' }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function (h) { return new DOMParser().parseFromString(h, 'text/html'); });
+  }
+  function pageKey(doc, id) {
+    var a = doc.querySelector('#' + id + ' .w-pagination-next');
+    var m = a && (a.getAttribute('href') || '').match(/([a-z0-9]+_page)=\d+/i);
+    return m ? m[1] : null;
+  }
+  function loadIndex() {
+    if (ixPromise) return ixPromise;
+    var posts = new Map(), faqs = new Map();
+    function collect(doc) {
+      Array.prototype.forEach.call(doc.querySelectorAll('[data-p]'), function (el) {
+        var o = readFields(el);
+        if (o.s) posts.set(o.s, o);
+      });
+      Array.prototype.forEach.call(doc.querySelectorAll('[data-f]'), function (el) {
+        var o = readFields(el), rt = el.querySelector('.w-richtext');
+        o.html = rt ? rt.innerHTML : '';
+        if (o.s) faqs.set(o.s, o);
+      });
+    }
+    ixPromise = fetchDoc(IX_URL).then(function (doc) {
+      collect(doc);
+      var keys = [pageKey(doc, 'obs-ix-p1'), pageKey(doc, 'obs-ix-f1')].filter(Boolean);
+      if (!keys.length) return;
+      function batch(from) {
+        var urls = [];
+        for (var n = from; n < from + 3; n++) {
+          urls.push(IX_URL + '?' + keys.map(function (k) { return k + '=' + n; }).join('&'));
+        }
+        return Promise.all(urls.map(fetchDoc)).then(function (docs) {
+          docs.forEach(collect);
+          var last = docs[docs.length - 1];
+          if (last.querySelector('#obs-ix-p1 .w-pagination-next, #obs-ix-f1 .w-pagination-next') && from < 40) return batch(from + 3);
+        });
+      }
+      return batch(2);
+    }).then(function () {
+      applyIndex(Array.from(posts.values()), Array.from(faqs.values()));
+    }).catch(function (e) {
+      ixPromise = null;
+      if (window.console) console.warn('[obs] Suchindex nicht geladen:', e);
+    });
+    return ixPromise;
+  }
+  function signature() {
+    return articles.map(function (a) { return a.slug + ':' + (a.calc ? a.calc.anchor : '') + ':' + a.faqCount; }).join('|');
+  }
+  function applyIndex(posts, faqs) {
+    var before = signature(), byA = {}, fa = {}, sections = [], answers = [];
+    posts.forEach(function (p) { var s = refToSlug[p.r]; if (s) (byA[s] = byA[s] || []).push(p); });
+    faqs.forEach(function (f) { var s = refToSlug[f.r]; if (s) (fa[s] = fa[s] || []).push(f); });
+    articles.forEach(function (a) {
+      var ps = (byA[a.slug] || []).sort(function (x, y) { return (parseFloat(x.o) || 0) - (parseFloat(y.o) || 0); });
+      var c = null;
+      ps.forEach(function (p) {
+        var h = (p.h || '').trim();
+        if (!h) return;
+        var isC = CALC_RE.test(h) && !NOCALC_RE.test(h);
+        if (isC && !c) c = { h: h, anchor: p.s };
+        sections.push({ a: a.slug, h: h, anchor: p.s, calc: isC, generic: GENERIC.test(h) });
+      });
+      if (ps.length) a.calc = c;
+      var n = 0;
+      (fa[a.slug] || []).sort(function (x, y) { return x.s.localeCompare(y.s, 'de', { numeric: true }); }).forEach(function (f) {
+        var q = (f.q || '').replace(/^\d+\.\s*/, '').trim();
+        if (!q) return;
+        var ex = tidy(excerpt(f.html));
+        answers.push({ a: a.slug, q: q, ex: ex, exText: text(ex.replace(/\\[()[\]]/g, ' ')) });
+        n++;
+      });
+      if (fa[a.slug]) a.faqCount = n;
+    });
+    DATA.sections = sections;
+    DATA.answers = answers;
+    DATA.topics = computeTopics();
+    IX = E.build(DATA); art = IX.art; topicById = IX.topic;
+    ixReady = true;
+    renderStatic();
+    if (state.view === 'results' || state.view === 'rechner' || before !== signature()) renderContent(true);
+    if (!panel.hidden) renderPanel();
+  }
+
+  /* ---------- Elemente ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var input = $('obs-q'), panel = $('obs-panel'), wrap = $('obs-searchwrap'), form = $('obs-form'),
+    searchBox = $('obs-search'), clearBtn = $('obs-clear'), cancelBtn = $('obs-cancel'), content = $('obs-content'),
+    tilesEl = $('obs-tiles'), chipsEl = $('obs-chips'), popEl = $('obs-popular'), statusEl = $('obs-status'),
+    photo = $('obs-photo'), heroEl = hub.querySelector('.obs-hero'), sentinel = $('obs-sentinel'),
+    navEl = document.querySelector('.navbar');
+  var mqMobile = window.matchMedia('(max-width: 720px)');
+  var mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var state = { view: 'all', topic: null, query: '' };
+  var opts = [], active = -1, timer = 0;
+
+  var IC = {
+    search: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+    doc: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>',
+    calc: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8.5 7h7"/><path d="M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></svg>',
+    hash: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14M5 15h14M10 3 8 21M16 3l-2 18"/></svg>',
+    arrow: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+    grid: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg>',
+    back: '<svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>'
+  };
+  var BAR = '<span class="obs-bar" aria-hidden="true"></span>';
+
+  /* ---------- Helfer ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function unesc(s) { return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&'); }
+  function plainTex(s) {
+    return s.replace(/\\textcolor\{[^}]*\}\{([^}]*)\}/g, '$1').replace(/\\(?:text|mathrm)\{([^}]*)\}/g, '$1')
+      .replace(/\\[a-zA-Z]+/g, ' ').replace(/[{}]/g, '');
+  }
+  var KOPT = { throwOnError: false, strict: 'ignore' };
+  function tex(s, display) {
+    if (window.katex) {
+      try { return window.katex.renderToString(s, { displayMode: !!display, throwOnError: false, strict: 'ignore' }); } catch (e) { /* Platzhalter */ }
+    }
+    return '<span class="obs-k" data-tex="' + esc(s) + '"' + (display ? ' data-d="1"' : '') + '>' + esc(plainTex(s)) + '</span>';
+  }
+  function upgradeTex() {
+    if (!window.katex) return;
+    Array.prototype.forEach.call(hub.querySelectorAll('.obs-k'), function (el) {
+      var s = el.getAttribute('data-tex');
+      try {
+        el.outerHTML = window.katex.renderToString(s, { displayMode: el.hasAttribute('data-d'), throwOnError: KOPT.throwOnError, strict: KOPT.strict });
+      } catch (e) { el.classList.remove('obs-k'); }
+    });
+  }
+  function richMath(html) {
+    return html.replace(/\\\[([\s\S]+?)\\\]|\\\(([\s\S]+?)\\\)/g, function (m, d, i) {
+      return d != null ? '<span class="obs-dmath">' + tex(unesc(d), true) + '</span>' : tex(unesc(i), false);
+    });
+  }
+  function url(slug, anchor) { return BASE + slug + (anchor ? '#' + anchor : ''); }
+  function levelLabel(levels) {
+    var k = levels.map(function (l) { return L.indexOf(l); }).sort().join('');
+    return { '0': L[0], '1': L[1], '2': L[2], '01': 'Klasse 5 bis 10', '12': 'ab Klasse 8', '012': 'alle Klassen' }[k] || '';
+  }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+  function ordered(tid) {
+    return articles.filter(function (a) { return a.topic === tid; }).sort(function (a, b) { return a.order - b.order || a.title.localeCompare(b.title, 'de'); });
+  }
+  function authors(a) {
+    var both = /gregor/i.test(a.author || '');
+    return { names: both ? 'Lisa und Gregor' : 'Lisa', av: '<span class="obs-avs" aria-hidden="true"><i class="obs-av obs-av-lisa"></i>' + (both ? '<i class="obs-av obs-av-gregor"></i>' : '') + '</span>' };
+  }
+  function hlTerms(q) {
+    var set = new Set();
+    E.fold(q).split(/[^a-z0-9]+/).forEach(function (w) {
+      if (w.length < 2) return;
+      var st = E.tokens(w)[0];
+      if (!st) return; /* Stoppwort */
+      set.add(w);
+      if (st.length >= 3) set.add(st);
+    });
+    return Array.from(set);
+  }
+  function hl(txt, terms) {
+    if (!terms || !terms.length) return esc(txt);
+    var low = txt.toLowerCase().replace(/[äöüß]/g, function (c) { return { 'ä': 'a', 'ö': 'o', 'ü': 'u', 'ß': 's' }[c]; });
+    var r = [];
+    terms.forEach(function (t) {
+      var i = 0;
+      while ((i = low.indexOf(t, i)) !== -1) {
+        if (i === 0 || /[^a-z0-9]/.test(low[i - 1]) || t.length >= 4) r.push([i, i + t.length]);
+        i += t.length;
+      }
+    });
+    if (!r.length) return esc(txt);
+    r.sort(function (a, b) { return a[0] - b[0]; });
+    var m = [r[0]];
+    for (var k = 1; k < r.length; k++) {
+      var last = m[m.length - 1];
+      if (r[k][0] <= last[1]) last[1] = Math.max(last[1], r[k][1]); else m.push(r[k]);
+    }
+    var out = '', pos = 0;
+    m.forEach(function (x) { out += esc(txt.slice(pos, x[0])) + '<mark>' + esc(txt.slice(x[0], x[1])) + '</mark>'; pos = x[1]; });
+    return out + esc(txt.slice(pos));
+  }
+
+  /* ---------- Skizzen: Tinte und oranger Marker ---------- */
+  function n1(v) { return Math.round(v * 10) / 10; }
+  function frame(xa, xb, ya, yb) {
+    return { X: function (x) { return 6 + (x - xa) / (xb - xa) * 108; }, Y: function (y) { return 84 - (y - ya) / (yb - ya) * 78; } };
+  }
+  function curve(fr, f, a, b, n) {
+    var d = '';
+    for (var i = 0; i <= n; i++) { var x = a + (b - a) * i / n; d += (i ? 'L' : 'M') + n1(fr.X(x)) + ' ' + n1(fr.Y(f(x))); }
+    return d;
+  }
+  function axes(fr) { return '<path class="g-ax" d="M6 ' + n1(fr.Y(0)) + 'H114M' + n1(fr.X(0)) + ' 6V84"/>'; }
+  function hcirc(cx, cy, r) { return '<circle class="g-ci" cx="' + n1(cx) + '" cy="' + n1(cy) + '" r="' + r + '"/>'; }
+  function dot(fr, x, y, cls, r) { return '<circle class="' + (cls || 'g-pt') + '" cx="' + n1(fr.X(x)) + '" cy="' + n1(fr.Y(y)) + '" r="' + (r || 2.8) + '"/>'; }
+  var SKETCH = {
+    'geometrie': function () {
+      return '<path class="g-fi" d="M16 78L90 78L16 22Z"/><path class="g-mk" d="M19 24L87 76"/><path class="g-ln" d="M16 78L90 78L16 22Z"/>' +
+        '<path class="g-ax" d="M16 70H24V78"/><text class="g-lb" x="56" y="44">c</text><text class="g-lb" x="6" y="54">a</text><text class="g-lb" x="50" y="89">b</text>';
+    },
+    'terme-gleichungen': function () {
+      return '<rect class="g-ar" x="16" y="8" width="46" height="46"/><rect class="g-fi" x="62" y="54" width="28" height="28"/>' +
+        '<path class="g-ln" d="M16 8H90V82H16Z M62 8V82 M16 54H90"/>' +
+        '<text class="g-lb" x="33" y="35">a²</text><text class="g-lb" x="70" y="35">ab</text><text class="g-lb" x="33" y="72">ab</text><text class="g-lb" x="70" y="72">b²</text>';
+    },
+    'lineare-funktionen-lgs': function () {
+      var fr = frame(-3, 3, -2.2, 2.2), xi = -0.9 / 1.45, yi = 0.55 * xi + 0.4;
+      return axes(fr) + '<path class="g-ln" d="' + curve(fr, function (x) { return 0.55 * x + 0.4; }, -3, 3, 2) + '"/>' +
+        '<path class="g-ln2" d="' + curve(fr, function (x) { return -0.9 * x - 0.5; }, -2.8, 1.9, 2) + '"/>' +
+        dot(fr, xi, yi) + hcirc(fr.X(xi), fr.Y(yi), 8);
+    },
+    'quadratische-gleichungen': function () {
+      var fr = frame(-2.8, 2.8, -2, 3), z = Math.sqrt(1.4 / 0.55);
+      return axes(fr) + '<path class="g-ln" d="' + curve(fr, function (x) { return 0.55 * x * x - 1.4; }, -2.6, 2.6, 40) + '"/>' +
+        dot(fr, -z, 0, 'g-po') + dot(fr, z, 0, 'g-po') + hcirc(fr.X(-z), fr.Y(0), 7) + hcirc(fr.X(z), fr.Y(0), 7) + dot(fr, 0, -1.4);
+    },
+    'potenzen-logarithmen': function () {
+      var fr = frame(-1.6, 4.2, -1.3, 4.3);
+      return axes(fr) + '<path class="g-ax" d="' + curve(fr, function (x) { return x; }, -1.2, 4.1, 1) + '" stroke-dasharray="3 4"/>' +
+        '<path class="g-ln" d="' + curve(fr, function (x) { return Math.pow(2, x); }, -1.6, 2.05, 30) + '"/>' +
+        '<path class="g-ln2" d="' + curve(fr, function (x) { return Math.log(x) / Math.LN2; }, 0.41, 4.2, 30) + '"/>' +
+        dot(fr, 1, 2, 'g-po') + hcirc(fr.X(1), fr.Y(2), 7);
+    },
+    'ableitungen': function () {
+      var fr = frame(-3, 3, -2.2, 2.2), f = function (x) { return 0.22 * x * x * x - 0.9 * x; }, x0 = 1.6, m = 0.66 * x0 * x0 - 0.9;
+      return axes(fr) + '<path class="g-ln" d="' + curve(fr, f, -2.65, 2.65, 40) + '"/>' +
+        '<path class="g-tan" d="' + curve(fr, function (x) { return f(x0) + m * (x - x0); }, x0 - 1.7, x0 + 1.3, 1) + '"/>' + dot(fr, x0, f(x0), 'g-po', 3.4);
+    },
+    'kurvendiskussion': function () {
+      var fr = frame(-2.8, 2.8, -2.4, 2.4), f = function (x) { return 0.3 * x * x * x - 1.2 * x; }, e = Math.sqrt(1.2 / 0.9);
+      return axes(fr) + '<path class="g-ln" d="' + curve(fr, f, -2.6, 2.6, 40) + '"/>' +
+        dot(fr, -e, f(-e)) + dot(fr, e, f(e)) + hcirc(fr.X(-e), fr.Y(f(-e)), 7) + hcirc(fr.X(e), fr.Y(f(e)), 7) + dot(fr, 0, 0, 'g-pg', 3.2);
+    },
+    'integralrechnung': function () {
+      var fr = frame(-1, 4, -0.4, 3), f = function (x) { return 0.25 * x * x - 0.4 * x + 0.8; }, a = 0.6, b = 3.1;
+      var area = 'M' + n1(fr.X(a)) + ' ' + n1(fr.Y(0)) + curve(fr, f, a, b, 24).replace(/^M/, 'L') + 'L' + n1(fr.X(b)) + ' ' + n1(fr.Y(0)) + 'Z';
+      return axes(fr) + '<path class="g-ar" d="' + area + '"/>' +
+        '<path class="g-ln2" d="M' + n1(fr.X(a)) + ' ' + n1(fr.Y(0)) + 'V' + n1(fr.Y(f(a))) + 'M' + n1(fr.X(b)) + ' ' + n1(fr.Y(0)) + 'V' + n1(fr.Y(f(b))) + '"/>' +
+        '<path class="g-ln" d="' + curve(fr, f, -0.8, 3.9, 40) + '"/>';
+    },
+    'stochastik': function () {
+      var v = [1, 6, 15, 20, 15, 6, 1], s = '';
+      v.forEach(function (h, i) {
+        var hh = h / 20 * 64, x = 10 + i * 15;
+        s += '<rect class="' + (i === 3 ? 'g-baro' : 'g-bar') + '" x="' + x + '" y="' + n1(80 - hh) + '" width="11" height="' + n1(hh) + '" rx="1.5"/>';
+      });
+      return '<path class="g-ax" d="M6 80.5H114"/>' + s;
+    }
+  };
+  function cover(t) {
+    return '<span class="obs-cover"><span class="obs-cover-f">' + tex(t.glyph) + BAR + '</span>' +
+      '<svg class="obs-cover-g" viewBox="0 0 120 90" preserveAspectRatio="xMidYMid meet" aria-hidden="true">' + (SKETCH[t.id] ? SKETCH[t.id]() : '') + '</svg></span>';
+  }
+
+  /* ---------- Bausteine ---------- */
+  function optArticle(slug, terms) {
+    var a = art[slug], t = topicById[a.topic];
+    return '<a class="obs-opt" data-opt href="' + url(a.slug) + '">' +
+      '<span class="obs-ic">' + IC.doc + '</span><span class="obs-ot"><span class="t">' + hl(a.title, terms) + '</span>' +
+      '<span class="s">' + esc(t.name) + (a.level ? ', ' + esc(a.level) : '') + (a.calc ? ', mit Rechner' : '') + '</span></span></a>';
+  }
+  function optCalc(c, terms) {
+    return '<a class="obs-opt is-calc" data-opt href="' + url(c.a, c.anchor) + '">' +
+      '<span class="obs-ic">' + IC.calc + '</span><span class="obs-ot"><span class="t">' + hl(c.title, terms) + '</span>' +
+      '<span class="s">im Beitrag ' + esc(art[c.a].title) + '</span></span></a>';
+  }
+  function optSection(s, terms) {
+    return '<a class="obs-opt" data-opt href="' + url(s.a, s.anchor) + '">' +
+      '<span class="obs-ic">' + IC.hash + '</span><span class="obs-ot"><span class="t">' + hl(s.title, terms) + '</span>' +
+      '<span class="s">Abschnitt in ' + esc(art[s.a].title) + '</span></span></a>';
+  }
+  function optTopic(t) {
+    return '<button type="button" class="obs-opt" data-opt data-topic="' + t.id + '">' +
+      '<span class="obs-ic">' + IC.grid + '</span><span class="obs-ot"><span class="t">Thema ' + esc(t.name) + '</span>' +
+      '<span class="s">' + plural(t.count, 'Beitrag', 'Beiträge') + ' in empfohlener Reihenfolge</span></span></button>';
+  }
+  function optQuery(q, label) {
+    return '<button type="button" class="obs-opt" data-opt data-q="' + esc(q) + '">' +
+      '<span class="obs-ic">' + IC.search + '</span><span class="obs-ot"><span class="t">' + esc(label || q) + '</span></span></button>';
+  }
+  function group(title, inner) {
+    return inner ? '<div class="obs-g" role="group" aria-label="' + esc(title) + '"><div class="obs-gh" aria-hidden="true">' + esc(title) + '</div>' + inner + '</div>' : '';
+  }
+  function answerCard(d, terms, isOpt) {
+    var a = art[d.a], au = authors(a);
+    return '<div class="obs-answer"><div class="lbl">' + au.av +
+      '<span>Antwort von ' + au.names + ' aus „' + esc(a.title) + '“</span></div>' +
+      '<div class="q">' + hl(d.title, terms) + '</div><div class="ex">' + richMath(d.ex) + '</div>' +
+      '<a class="obs-more"' + (isOpt ? ' data-opt' : '') + ' href="' + url(a.slug) + '">Ganze Antwort im Beitrag lesen ' + IC.arrow + '</a></div>';
+  }
+  function ctaBox() {
+    return '<div class="obs-cta"><span class="t">Dein Thema ist nicht dabei?</span><p>In der Gratis-Probestunde erklärt dir ein Tutor genau dein Thema.</p>' +
+      '<a class="obs-btn" data-opt href="' + CTA_URL + '">Gratis Probestunde sichern ' + IC.arrow + '</a></div>';
+  }
+
+  /* ---------- Vorschlagsliste ---------- */
+  function renderPanel() {
+    var q = input.value;
+    var h = '';
+    if (!q.trim()) {
+      h = group('Oft gesucht', DATA.popular.map(function (s) { return optArticle(s, []); }).join('')) +
+        group('Du kannst auch ganze Fragen stellen', optQuery('Wie leite ich e hoch x ab?') + optQuery('Kann die Lösung negativ sein?') + optQuery('pq-Formel Rechner'));
+    } else {
+      var res = E.search(IX, q), terms = hlTerms(q);
+      if (res.calcOnly) {
+        h = group('Rechner', '<button type="button" class="obs-opt is-calc" data-opt data-action="rechner"><span class="obs-ic">' + IC.calc +
+          '</span><span class="obs-ot"><span class="t">Alle ' + res.calcs.length + ' Rechner ansehen</span><span class="s">nach Thema sortiert</span></span></button>' +
+          res.calcs.slice(0, 4).map(function (c) { return optCalc(c, []); }).join(''));
+      } else if (res.levelOnly) {
+        h = group('Beiträge für ' + res.level, res.articles.slice(0, 8).map(function (x) { return optArticle(x.a, []); }).join('')) + footer(res);
+      } else if (!res.articles.length && !res.calcs.length) {
+        var near = E.nearest(IX, q);
+        h = '<div class="obs-zero"><p class="z1">Zu „' + esc(q.trim()) + '“ haben wir noch keinen Beitrag.</p></div>' +
+          (near.length ? group('Meintest du', near.map(function (s) { return optArticle(s, []); }).join('')) : '') +
+          '<div class="obs-zero">' + ctaBox() + '</div>';
+      } else {
+        if (res.topic) h += group('Thema', optTopic(topicById[res.topic.topic]));
+        if (res.answer) h += answerCard(res.answer, terms, true);
+        h += group('Beiträge', res.articles.slice(0, res.answer ? 4 : 5).map(function (x) { return optArticle(x.a, terms); }).join(''));
+        if (res.calcs.length) h += group(res.calcTopic ? 'Rechner zum Thema ' + res.calcTopic.name : 'Rechner',
+          res.calcs.slice(0, 3).map(function (c) { return optCalc(c, terms); }).join(''));
+        if (res.sections.length) h += group('Abschnitte', res.sections.slice(0, 3).map(function (s) { return optSection(s, terms); }).join(''));
+        h += footer(res);
+      }
+    }
+    panel.innerHTML = h;
+    opts = Array.prototype.slice.call(panel.querySelectorAll('[data-opt]'));
+    opts.forEach(function (o, i) { o.id = 'obs-opt-' + i; o.setAttribute('role', 'option'); o.setAttribute('tabindex', '-1'); });
+    setActive(-1);
+    openPanel();
+  }
+  function footer(res) {
+    var n = res.articles.length, na = res.answers.length + (res.answer ? 1 : 0);
+    return '<div class="obs-pfoot"><span>' + plural(n, 'Beitrag', 'Beiträge') + (na ? ', ' + plural(na, 'Antwort', 'Antworten') : '') +
+      '</span><button type="button" class="obs-all" data-opt data-action="all">Alle Treffer anzeigen</button></div>';
+  }
+  function setActive(i) {
+    if (active >= 0 && opts[active]) opts[active].classList.remove('is-active');
+    active = i;
+    if (i >= 0 && opts[i]) {
+      opts[i].classList.add('is-active');
+      input.setAttribute('aria-activedescendant', opts[i].id);
+      opts[i].scrollIntoView({ block: 'nearest' });
+    } else {
+      input.removeAttribute('aria-activedescendant');
+    }
+  }
+  function openPanel() { panel.hidden = false; input.setAttribute('aria-expanded', 'true'); }
+  function closePanel() { panel.hidden = true; input.setAttribute('aria-expanded', 'false'); setActive(-1); }
+  function openSheet() {
+    if (!mqMobile.matches || wrap.classList.contains('is-sheet')) return;
+    wrap.style.height = wrap.offsetHeight + 'px';
+    wrap.classList.add('is-sheet');
+    root.classList.add('obs-lock');
+  }
+  function closeSheet() {
+    if (!wrap.classList.contains('is-sheet')) return;
+    wrap.classList.remove('is-sheet');
+    wrap.style.height = '';
+    root.classList.remove('obs-lock');
+    input.blur();
+  }
+
+  /* ---------- Inhalt ---------- */
+  function step(a, i, terms, hits) {
+    var t = topicById[a.topic], au = authors(a);
+    var meta = '<span class="obs-by">' + au.av + esc(au.names) + '</span>' + (a.level ? '<span>' + esc(a.level) + '</span>' : '') +
+      (i == null ? '<span>' + esc(t.name) + '</span>' : '') + (a.faqCount ? '<span>' + plural(a.faqCount, 'Frage', 'Fragen') + ' mit Antwort</span>' : '') +
+      (a.calc ? '<a class="obs-calc" href="' + url(a.slug, a.calc.anchor) + '">' + IC.calc + 'Rechner</a>' : '');
+    var hitHtml = '';
+    if (hits && hits.length) {
+      hitHtml = '<div class="obs-hits">' + hits.map(function (d) {
+        return '<a class="obs-hit" href="' + url(d.a, d.anchor) + '">' + (d.type === 'calc' ? IC.calc : IC.hash) + hl(d.title, terms) + '</a>';
+      }).join('') + '</div>';
+    }
+    return '<li class="obs-step">' + (i != null ? '<span class="obs-n" aria-label="Schritt ' + (i + 1) + '"><b>' + (i + 1) + '</b></span>' : '') +
+      '<div class="obs-body"><a class="obs-title" href="' + url(a.slug) + '">' + hl(a.title, terms) + '</a>' +
+      (a.desc ? '<p class="obs-desc">' + esc(a.desc) + '</p>' : '') + '<div class="obs-meta">' + meta + '</div>' + hitHtml + '</div></li>';
+  }
+  function topicSection(t, first) {
+    var list = ordered(t.id);
+    var calcN = list.filter(function (a) { return a.calc; }).length;
+    return '<section class="obs-tsec' + (first ? ' is-first' : '') + '" id="thema-' + t.id + '" aria-labelledby="obs-h-' + t.id + '">' +
+      '<header class="obs-thead">' + cover(t) + '<h2 id="obs-h-' + t.id + '">' + esc(t.name) + '</h2><p>' + esc(t.desc) + '</p>' +
+      '<p class="m">' + plural(list.length, 'Beitrag', 'Beiträge') + ' in empfohlener Reihenfolge' + (calcN ? ', ' + calcN + ' davon mit Rechner' : '') + '</p></header>' +
+      '<ol class="obs-path">' + list.map(function (a, i) { return step(a, i); }).join('') + '</ol></section>';
+  }
+  function filterbar(label, value) {
+    return '<div class="obs-filterbar"><span class="lbl">' + esc(label) + ':</span><strong>' + esc(value) + '</strong>' +
+      '<button type="button" class="obs-reset" data-action="reset">' + IC.back + 'Alle Themen zeigen</button></div>';
+  }
+  function calcItem(a) {
+    return '<a class="obs-calcitem" href="' + url(a.slug, a.calc.anchor) + '"><span class="obs-ic">' + IC.calc + '</span>' +
+      '<span><span class="t">' + esc(a.calc.h) + '</span><span class="s">im Beitrag ' + esc(a.title) + '</span></span></a>';
+  }
+  function calcCount() { return articles.filter(function (a) { return a.calc; }).length; }
+  function rechnerView() {
+    return filterbar('Ansicht', 'Alle Rechner') +
+      '<div class="obs-rhead"><h2>' + calcCount() + ' Rechner zum Ausprobieren</h2><p>Gib deine Werte ein und lass dir das Ergebnis zeigen, bei den meisten Rechnern mit Rechenweg. Jeder Rechner gehört zu einem Beitrag, der das Thema erklärt.</p></div>' +
+      DATA.topics.map(function (t) {
+        var list = ordered(t.id).filter(function (a) { return a.calc; });
+        return list.length ? '<div class="obs-calcgroup"><h3>' + esc(t.name) + '</h3><div class="obs-calcgrid">' + list.map(calcItem).join('') + '</div></div>' : '';
+      }).join('');
+  }
+  function resultsView(q) {
+    var res = E.search(IX, q), terms = hlTerms(q);
+    var head = '<div class="obs-filterbar"><span class="lbl">Suche:</span><strong>„' + esc(q.trim()) + '“</strong>' +
+      '<button type="button" class="obs-reset" data-action="reset">' + IC.back + 'Alle Themen zeigen</button></div>';
+    if (res.empty) return head;
+    if (res.calcOnly) return rechnerView();
+    if (!res.articles.length && !res.calcs.length) {
+      var near = E.nearest(IX, q);
+      say('Kein Beitrag zu ' + q.trim());
+      return head + '<div class="obs-rhead"><h2>Dazu haben wir noch keinen Beitrag</h2><p>Probier ein anderes Wort oder wähle oben ein Thema.</p></div>' +
+        (near.length ? '<div class="obs-rsec"><h3>Meintest du</h3><ol class="obs-rlist">' + near.map(function (s) { return step(art[s], null); }).join('') + '</ol></div>' : '') +
+        '<div class="obs-rsec" style="max-width:560px">' + ctaBox() + '</div>';
+    }
+    say(plural(res.articles.length, 'passender Beitrag', 'passende Beiträge'));
+    var h = head + '<div class="obs-results">';
+    h += '<div class="obs-rhead"><h2>' + plural(res.articles.length, 'passender Beitrag', 'passende Beiträge') + (res.level ? ' für ' + esc(res.level) : '') + '</h2>' +
+      (res.topic ? '<p>Passt zum Thema ' + esc(topicById[res.topic.topic].name) + '. <button type="button" class="obs-reset" data-topic="' + res.topic.topic + '" style="margin-left:6px">Thema öffnen</button></p>' : '') + '</div>';
+    if (res.answer) h += '<div class="obs-rsec"><h3>Direkte Antwort</h3>' + answerCard(res.answer, terms) + '</div>';
+    h += '<div class="obs-rsec"><h3>Beiträge</h3><ol class="obs-rlist">' + res.articles.map(function (x) {
+      return step(art[x.a], null, terms, x.hits);
+    }).join('') + '</ol></div>';
+    if (res.calcs.length) {
+      h += '<div class="obs-rsec"><h3>' + (res.calcTopic ? 'Rechner zum Thema ' + esc(res.calcTopic.name) : 'Rechner') + '</h3><div class="obs-calcgrid">' +
+        res.calcs.map(function (c) { return calcItem(art[c.a]); }).join('') + '</div></div>';
+    }
+    var more = res.answers.slice(0, 4);
+    if (more.length) h += '<div class="obs-rsec"><h3>Weitere Antworten</h3><div class="obs-answers">' + more.map(function (d) { return answerCard(d, terms); }).join('') + '</div></div>';
+    return h + '</div>';
+  }
+  function say(msg) { statusEl.textContent = ''; setTimeout(function () { statusEl.textContent = msg; }, 60); }
+  function renderContent(quiet) {
+    var h;
+    if (state.view === 'topic' && topicById[state.topic]) h = filterbar('Thema', topicById[state.topic].name) + topicSection(topicById[state.topic], true);
+    else if (state.view === 'rechner') h = rechnerView();
+    else if (state.view === 'results') h = resultsView(state.query);
+    else h = DATA.topics.map(function (t, i) { return topicSection(t, i === 0); }).join('');
+    content.innerHTML = h;
+    upgradeTex();
+    Array.prototype.forEach.call(hub.querySelectorAll('.obs-tile, .obs-chip'), function (el) {
+      var on = (state.view === 'topic' && el.getAttribute('data-topic') === state.topic) || (state.view === 'rechner' && el.getAttribute('data-action') === 'rechner');
+      if (el.hasAttribute('aria-pressed')) el.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    if (!quiet && state.view === 'topic' && topicById[state.topic]) say('Thema ' + topicById[state.topic].name + ', ' + plural(ordered(state.topic).length, 'Beitrag', 'Beiträge'));
+  }
+  function navH() {
+    if (!navEl) return 0;
+    var p = getComputedStyle(navEl).position;
+    return p === 'sticky' || p === 'fixed' ? navEl.offsetHeight : 0;
+  }
+  function scrollToContent() {
+    var band = wrap.classList.contains('is-stuck') ? wrap.offsetHeight : 130;
+    var y = content.getBoundingClientRect().top + window.pageYOffset - navH() - band - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: mqReduce.matches ? 'auto' : 'smooth' });
+  }
+  function setHash(h) {
+    try { history.replaceState(null, '', h ? '#' + h : location.pathname); } catch (e) { /* ohne Verlauf */ }
+  }
+  function clearInput() { input.value = ''; clearBtn.hidden = true; }
+  function selectTopic(id) { state.view = 'topic'; state.topic = id; clearInput(); closePanel(); closeSheet(); renderContent(); setHash('thema-' + id); scrollToContent(); }
+  function selectRechner() { state.view = 'rechner'; state.topic = null; clearInput(); closePanel(); closeSheet(); renderContent(); setHash('rechner'); scrollToContent(); }
+  function showResults() {
+    if (!input.value.trim()) return;
+    state.view = 'results'; state.query = input.value; state.topic = null;
+    closePanel(); closeSheet(); renderContent(); setHash(''); scrollToContent();
+  }
+  function resetView() { state.view = 'all'; state.topic = null; clearInput(); renderContent(); setHash(''); scrollToContent(); }
+
+  /* ---------- Kopf, Karten, Chips ---------- */
+  function renderStatic() {
+    var nCalc = calcCount();
+    $('obs-byline-text').innerHTML = 'Von Lisa und Gregor aus unserem Tutorenteam: <strong>' + articles.length +
+      '</strong> Beiträge, <strong>' + nCalc + '</strong> Rechner und <strong>' + (ixReady ? DATA.answers.length : S.answers) + '</strong> Antworten auf typische Fragen.';
+    var tiles = DATA.topics.filter(function (t) { return !t.other; });
+    tilesEl.innerHTML = tiles.map(function (t) {
+      var lv = levelLabel(t.levels);
+      return '<button type="button" class="obs-tile" data-topic="' + t.id + '" aria-pressed="' + (state.view === 'topic' && state.topic === t.id) + '">' + cover(t) +
+        '<span class="obs-tbody"><span class="n">' + esc(t.name) + '</span><span class="m">' + plural(t.count, 'Beitrag', 'Beiträge') + (lv ? ', ' + esc(lv) : '') + '</span></span></button>';
+    }).join('') + '<button type="button" class="obs-tile is-calc" data-action="rechner" aria-pressed="' + (state.view === 'rechner') + '"><span class="obs-cover">' + IC.calc +
+      '<span class="obs-calcnote">mit Rechenweg</span></span><span class="obs-tbody"><span class="n">Alle Rechner</span><span class="m">' + nCalc + ' Rechner zum Ausprobieren</span></span></button>';
+    chipsEl.innerHTML = tiles.map(function (t) {
+      return '<button type="button" class="obs-chip" data-topic="' + t.id + '" aria-pressed="' + (state.view === 'topic' && state.topic === t.id) + '">' + esc(t.name) + '</button>';
+    }).join('') + '<button type="button" class="obs-chip" data-action="rechner" aria-pressed="' + (state.view === 'rechner') + '">' + IC.calc + 'Alle Rechner</button>';
+    upgradeTex();
+  }
+
+  /* ---------- Startaufbau ---------- */
+  popEl.insertAdjacentHTML('beforeend', DATA.popular.map(function (s) {
+    var label = S.popLabel[s] || art[s].title;
+    return '<button type="button" class="obs-chip" data-q="' + esc(label) + '">' + esc(label) + '</button>';
+  }).join('') + '<button type="button" class="obs-chip obs-q" data-q="Wie leite ich e hoch x ab?">„Wie leite ich e hoch x ab?“</button>');
+  var q0 = '';
+  try { q0 = (new URLSearchParams(location.search).get('q') || '').trim(); } catch (e) { /* alter Browser */ }
+  var h0 = (location.hash || '').replace('#', '');
+  if (q0) { input.value = q0; clearBtn.hidden = false; state.view = 'results'; state.query = q0; }
+  else if (h0.indexOf('thema-') === 0 && topicById[h0.slice(6)]) { state.view = 'topic'; state.topic = h0.slice(6); }
+  else if (h0 === 'rechner') state.view = 'rechner';
+  renderStatic();
+  renderContent(true);
+  window.OMBS_UI_OK = true;
+  if (q0) loadIndex();
+
+  /* ---------- Ereignisse ---------- */
+  input.addEventListener('focus', function () { loadIndex(); openSheet(); renderPanel(); });
+  input.addEventListener('input', function () {
+    clearBtn.hidden = !input.value;
+    clearTimeout(timer);
+    timer = setTimeout(renderPanel, 40);
+  });
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown') { e.preventDefault(); if (panel.hidden) renderPanel(); setActive(opts.length ? (active + 1) % opts.length : -1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(opts.length ? (active <= 0 ? opts.length - 1 : active - 1) : -1); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (active >= 0 && opts[active]) opts[active].click(); else showResults(); }
+    else if (e.key === 'Escape') { if (!panel.hidden) closePanel(); else clearInput(); closeSheet(); }
+  });
+  form.addEventListener('submit', function (e) { e.preventDefault(); showResults(); });
+  clearBtn.addEventListener('click', function () { clearInput(); input.focus(); renderPanel(); });
+  cancelBtn.addEventListener('click', function () { closePanel(); closeSheet(); });
+
+  hub.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-q],[data-topic],[data-action]');
+    if (!t || !hub.contains(t)) return;
+    if (t.hasAttribute('data-q')) {
+      e.preventDefault();
+      loadIndex();
+      input.value = t.getAttribute('data-q'); clearBtn.hidden = false;
+      if (mqMobile.matches) openSheet();
+      input.focus(); renderPanel();
+      return;
+    }
+    if (t.hasAttribute('data-topic')) { e.preventDefault(); selectTopic(t.getAttribute('data-topic')); return; }
+    var act = t.getAttribute('data-action');
+    if (act === 'rechner') { e.preventDefault(); selectRechner(); return; }
+    if (act === 'all') { e.preventDefault(); showResults(); return; }
+    if (act === 'reset') { e.preventDefault(); resetView(); }
+  });
+  document.addEventListener('click', function (e) {
+    if (!searchBox.contains(e.target) && !wrap.classList.contains('is-sheet') && !panel.hidden) closePanel();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== '/' || e.metaKey || e.ctrlKey || e.altKey) return;
+    var el = document.activeElement, tag = (el && el.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (el && el.isContentEditable)) return;
+    e.preventDefault();
+    input.focus();
+  });
+  if (mqMobile.addEventListener) mqMobile.addEventListener('change', function () { closeSheet(); closePanel(); });
+  window.addEventListener('pageshow', function (e) { if (e.persisted) { closeSheet(); closePanel(); } });
+
+  /* Suchleiste "klebt": Rahmen und Themen-Chips einblenden. Per Scroll gemessen, damit es auch
+     nach dem Wiederherstellen der Scrollposition (Neuladen, Zurueck) stimmt. */
+  var navNow = navH(), ticking = false;
+  function checkStuck() {
+    ticking = false;
+    var on = sentinel.getBoundingClientRect().top < navNow + 1;
+    if (on !== wrap.classList.contains('is-stuck')) {
+      wrap.classList.toggle('is-stuck', on);
+      root.style.setProperty('--obs-band-h', wrap.offsetHeight + 'px');
+    }
+  }
+  function updateBand() {
+    navNow = navH();
+    root.style.setProperty('--obs-nav-h', navNow + 'px');
+    checkStuck();
+    root.style.setProperty('--obs-band-h', wrap.offsetHeight + 'px');
+  }
+  window.addEventListener('scroll', function () {
+    if (!ticking) { ticking = true; requestAnimationFrame(checkStuck); }
+  }, { passive: true });
+  window.addEventListener('hashchange', function () {
+    var h = (location.hash || '').replace('#', '');
+    if (h.indexOf('thema-') === 0 && topicById[h.slice(6)]) selectTopic(h.slice(6));
+    else if (h === 'rechner') selectRechner();
+  });
+  /* Foto im Kopfbereich: reicht von der Ueberschrift bis unter "Oft gesucht" */
+  function sizePhoto() {
+    var ht = hub.getBoundingClientRect().top;
+    var top = heroEl.getBoundingClientRect().top - ht;
+    var bottom = popEl.getBoundingClientRect().bottom - ht;
+    var off = mqMobile.matches ? 0 : 16;
+    photo.style.top = (top + off) + 'px';
+    photo.style.height = Math.round(bottom - top - off + (mqMobile.matches ? 30 : 34)) + 'px';
+  }
+  function onResize() { updateBand(); sizePhoto(); }
+  onResize();
+  window.addEventListener('resize', onResize);
+  window.addEventListener('load', function () {
+    onResize();
+    if (window.katex) upgradeTex(); else hub.classList.add('is-plain');
+    var idle = window.requestIdleCallback || function (f) { return setTimeout(f, 1500); };
+    idle(function () { loadIndex(); }, { timeout: 4000 });
+  });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(sizePhoto);
+  var kEl = document.getElementById('obs-katex');
+  if (kEl && !window.katex) kEl.addEventListener('load', function () { hub.classList.remove('is-plain'); upgradeTex(); sizePhoto(); });
+})();
+</script>

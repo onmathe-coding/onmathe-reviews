@@ -34,3 +34,7 @@ Beide teilen sich den Browser-Cache `grsReviewsV6` (24 h).
 ## Manuell aktualisieren
 
 Actions → Reviews aktualisieren → Run workflow
+
+## Blog-Hub
+
+`blog-hub/` enthält die drei Webflow-Embeds der Blog-Übersicht [/blog](https://www.onmathe.de/blog) (Suche, Themen, Lernpfade). Aufbau und Pflege siehe `blog-hub/README.md`. Die Action oben betrifft diesen Ordner nicht.

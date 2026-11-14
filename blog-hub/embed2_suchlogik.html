@@ -1,0 +1,305 @@
+<!-- OnMathe Blog-Hub 2/3: Suchlogik (Normalisieren, Wortstamm, Tippfehler, Gewichtung). -->
+<script data-cookieconsent="ignore">
+/* OnMathe Blog-Suche, Suchlogik ohne DOM (Prefix ombs).
+   Normalisieren, Stamm bilden, Tippfehler tolerieren, Felder gewichten,
+   Treffer nach Art gruppieren (Thema, direkte Antwort, Beitrag, Rechner, Abschnitt). */
+var OMBS_ENGINE = (function () {
+  'use strict';
+
+  var STOP = new Set(('der die das den dem des ein eine einer eines einem einen und oder wie was wo wann warum wieso weshalb ' +
+    'welche welcher welches welchen ist sind bin bist sein wird werden wurde kann konnen muss mussen darf durfen soll sollen will ' +
+    'ich du er sie es wir ihr man mich mir dich dir mein meine meinen dein deine sich im in an am auf aus bei mit nach von vom ' +
+    'zu zum zur fur uber unter um als auch noch nur so da dass wenn denn nicht kein keine mal bitte einfach erklart erklarung ' +
+    'genau richtig gibt geht gehts mache macht machen rechne rechnet rechnen berechne berechnet berechnen bestimme bestimmt ' +
+    'bestimmen lose lost losen hilfe frage aufgabe aufgaben ubung ubungen beispiel beispiele thema brauche brauchst habe hat ' +
+    'denn dann immer jetzt heisst bedeutet ganz gut schnell ab').split(' '));
+
+  var LEVELS = ['Klasse 5 bis 7', 'Klasse 8 bis 10', 'Oberstufe'];
+
+  var TOPIC_KW = {
+    'geometrie': 'geometrie flachen korper dreieck kreis rechteck quader pythagoras flacheninhalt umfang volumen',
+    'terme-gleichungen': 'terme gleichungen umformen klammern binomisch definitionsmenge',
+    'lineare-funktionen-lgs': 'lineare funktionen gerade lgs gleichungssysteme',
+    'quadratische-gleichungen': 'quadratische gleichungen parabel scheitelpunkt pq mitternachtsformel',
+    'potenzen-logarithmen': 'potenzen logarithmen exponent log exponentialgleichung',
+    'ableitungen': 'ableitungen ableiten differentialrechnung differenzieren',
+    'kurvendiskussion': 'kurvendiskussion funktionsuntersuchung extrempunkte wendepunkte symmetrie',
+    'integralrechnung': 'integralrechnung integral integrieren stammfunktion',
+    'stochastik': 'stochastik wahrscheinlichkeit wahrscheinlichkeitsrechnung kombinatorik zufall'
+  };
+
+  function fold(s) {
+    return String(s || '').toLowerCase()
+      .replace(/\\(text|textcolor|mathrm|mathbb)\{[^}]*\}/g, ' ')
+      .replace(/\\[a-z]+/g, ' ')
+      .replace(/²/g, '2').replace(/³/g, '3')
+      .replace(/ä/g, 'a').replace(/ö/g, 'o').replace(/ü/g, 'u').replace(/ß/g, 'ss')
+      .replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u')
+      .replace(/\be\s*-?\s*funktion/g, 'efunktion')
+      .replace(/\be\s*(?:hoch|\^)\s*x\b/g, 'efunktion')
+      .replace(/\bleite[nt]?\b(.*)\bab\b/, 'ableiten $1')
+      .replace(/\bleite[nt]?\b(.*)\bauf\b/, 'aufleiten $1')
+      .replace(/\bp\s*-\s*q\b|\bp\s+q\b/g, 'pq')
+      .replace(/\ba\s*-\s*b\s*-\s*c\b|\ba\s+b\s+c\b/g, 'abc');
+  }
+
+  function stem(t) {
+    if (t.length < 6 || /^\d+$/.test(t)) return t;
+    var suf = ['ungen', 'ung', 'en', 'er', 'es', 'e', 'n', 's'];
+    for (var i = 0; i < suf.length; i++) {
+      var s = suf[i];
+      if (t.length - s.length >= 5 && t.slice(-s.length) === s) return t.slice(0, -s.length);
+    }
+    return t;
+  }
+
+  function tokens(s, keepStop) {
+    var out = [];
+    fold(s).split(/[^a-z0-9]+/).forEach(function (w) {
+      if (!w || (!keepStop && STOP.has(w))) return;
+      out.push(stem(w));
+    });
+    return out;
+  }
+
+  /* Damerau-Levenshtein (eingeschraenkt), -1 wenn ueber max */
+  function osa(a, b, max) {
+    var al = a.length, bl = b.length;
+    if (Math.abs(al - bl) > max) return -1;
+    var prev2 = null, prev = [], cur, i, j;
+    for (j = 0; j <= bl; j++) prev[j] = j;
+    for (i = 1; i <= al; i++) {
+      cur = [i];
+      var rowMin = i;
+      for (j = 1; j <= bl; j++) {
+        var cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        var v = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost);
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, prev2[j - 2] + 1);
+        cur[j] = v;
+        if (v < rowMin) rowMin = v;
+      }
+      if (rowMin > max) return -1;
+      prev2 = prev;
+      prev = cur;
+    }
+    return prev[bl] <= max ? prev[bl] : -1;
+  }
+
+  function matchScore(q, d, typing) {
+    if (q === d) return 1;
+    var ql = q.length, dl = d.length;
+    if (ql === 1 || dl === 1) return 0;
+    if (dl > ql && d.lastIndexOf(q, 0) === 0) return typing ? 0.9 : (ql >= 4 ? 0.75 : 0.5);
+    if (dl >= 6 && ql > dl && q.lastIndexOf(d, 0) === 0) return 0.6;
+    if (ql >= 4 && d.indexOf(q) > 0) return 0.55;
+    if (q[0] !== d[0]) return 0;
+    if (ql >= 4 && Math.abs(ql - dl) <= 2) {
+      var dist = osa(q, d, ql >= 8 ? 2 : 1);
+      if (dist === 1) return 0.62;
+      if (dist === 2) return 0.45;
+    }
+    if (typing && ql >= 5 && dl > ql) {
+      if (osa(q, d.slice(0, ql), 1) === 1) return 0.5;
+    }
+    return 0;
+  }
+
+  function build(data) {
+    var vocab = new Map(), vlist = [], docs = [];
+    function vid(t) {
+      var id = vocab.get(t);
+      if (id === undefined) { id = vlist.length; vocab.set(t, id); vlist.push(t); }
+      return id;
+    }
+    function field(text, w) { return { w: w, ids: tokens(text).map(vid) }; }
+    var art = {}, topic = {};
+    data.articles.forEach(function (a) { art[a.slug] = a; });
+    data.topics.forEach(function (t) { topic[t.id] = t; });
+
+    data.topics.forEach(function (t) {
+      docs.push({ type: 'topic', topic: t.id, title: t.name, norm: fold(t.name),
+        fields: [field(t.name, 3), field(TOPIC_KW[t.id] || '', 1.6), field(t.desc, 0.8)] });
+    });
+    data.articles.forEach(function (a) {
+      docs.push({ type: 'article', a: a.slug, title: a.title, norm: fold(a.title), pop: a.clicks || 0,
+        fields: [field(a.title, 3), field(a.kw, 2.4), field(a.sub, 1), field(a.desc, 0.9), field(topic[a.topic].name, 1.8)] });
+    });
+    data.sections.forEach(function (s) {
+      if (s.generic && !s.calc) return;
+      docs.push({ type: s.calc ? 'calc' : 'section', a: s.a, title: s.h, anchor: s.anchor, norm: fold(s.h),
+        fields: [field(s.h, s.calc ? 2.6 : 2.2), field(art[s.a].title, 1), field(art[s.a].kw, s.calc ? 0.8 : 0.6)] });
+    });
+    data.answers.forEach(function (x) {
+      docs.push({ type: 'answer', a: x.a, title: x.q, ex: x.ex, norm: fold(x.q),
+        fields: [field(x.q, 2), field(x.exText, 0.6), field(art[x.a].title, 0.7)] });
+    });
+    return { docs: docs, vlist: vlist, art: art, topic: topic, data: data,
+      answerWords: function (d) { return d.fields[0].ids.length; } };
+  }
+
+  function detectLevel(q) {
+    var lvl = null, rest = q, m;
+    if ((m = q.match(/\b(?:klasse|kl|stufe|jahrgang)\s*(\d{1,2})\b/) || q.match(/\b(\d{1,2})\s*\.?\s*klasse\b/))) {
+      var n = +m[1];
+      if (n >= 5 && n <= 13) {
+        lvl = n <= 7 ? LEVELS[0] : n <= 10 ? LEVELS[1] : LEVELS[2];
+        rest = rest.replace(m[0], ' ');
+      }
+    }
+    if ((m = q.match(/\b(oberstufe|abitur|abi|kursstufe)\b/))) { lvl = LEVELS[2]; rest = rest.replace(m[0], ' '); }
+    if ((m = q.match(/\bunterstufe\b/))) { lvl = LEVELS[0]; rest = rest.replace(m[0], ' '); }
+    if ((m = q.match(/\bmittelstufe\b/))) { lvl = LEVELS[1]; rest = rest.replace(m[0], ' '); }
+    return { level: lvl, rest: rest };
+  }
+
+  var TYPE = { topic: 1.15, article: 1, calc: 0.85, section: 0.72, answer: 0.68 };
+  var QUESTION = /^(wie|was|wann|warum|wieso|weshalb|welche|welcher|welches|kann|darf|muss|brauche|ist|sind|gibt|wo|woran|wofur|wozu)\b/;
+
+  function search(index, raw) {
+    var full = fold(raw).replace(/\s+/g, ' ').trim();
+    var lv = detectLevel(full);
+    var rest = lv.rest.replace(/\s+/g, ' ').trim();
+    // "Rechner" ist eine Absicht, kein Inhaltswort: aus der Suche nehmen, Rechner bevorzugen
+    var wantCalc = /\brechner\b|rechner$/.test(rest) && !/^(integral|ableitungs?|potenz)rechner$/.test(rest);
+    if (wantCalc) rest = rest.replace(/\brechner\b/g, ' ').replace(/\s+/g, ' ').trim();
+    var qt = tokens(rest);
+    var res = { query: raw, level: lv.level, empty: !qt.length && !lv.level && !wantCalc, articles: [], calcs: [],
+      sections: [], answers: [], answer: null, topic: null, calcTopic: null,
+      levelOnly: !qt.length && !!lv.level, calcOnly: !qt.length && wantCalc };
+    if (res.empty) return res;
+    if (res.levelOnly || res.calcOnly) {
+      res.articles = index.data.articles.filter(function (a) {
+        return (!lv.level || a.level === lv.level) && (!wantCalc || a.calc);
+      }).map(function (a) { return { a: a.slug, score: 1, hits: [] }; });
+      if (wantCalc) res.calcs = res.articles.map(function (x) {
+        var a = index.art[x.a];
+        return { type: 'calc', a: a.slug, title: a.calc.h, anchor: a.calc.anchor };
+      });
+      return res;
+    }
+    var typingLast = !/\s$/.test(raw);
+    var tables = qt.map(function (q, i) {
+      var m = new Float32Array(index.vlist.length), typing = typingLast && i === qt.length - 1;
+      for (var v = 0; v < index.vlist.length; v++) m[v] = matchScore(q, index.vlist[v], typing);
+      return m;
+    });
+    var tokW = qt.map(function (q) { return q.length === 1 ? 0.35 : 1; });
+    var question = QUESTION.test(full) || /\?\s*$/.test(raw) || tokens(rest, true).length >= 5;
+    var phrase = rest.length >= 3 ? rest : '';
+    var scored = [];
+    for (var di = 0; di < index.docs.length; di++) {
+      var d = index.docs[di];
+      if (lv.level && d.a && index.art[d.a].level !== lv.level) continue;
+      var sum = 0, hit = 0, totalW = 0, strongQ = 0;
+      for (var i = 0; i < qt.length; i++) {
+        var best = 0, tab = tables[i];
+        for (var f = 0; f < d.fields.length; f++) {
+          var fl = d.fields[f], ids = fl.ids;
+          for (var k = 0; k < ids.length; k++) {
+            var s = tab[ids[k]] * fl.w;
+            if (s > best) best = s;
+            if (f === 0 && tab[ids[k]] >= 0.6 && qt[i].length > 1) strongQ++;
+          }
+        }
+        totalW += tokW[i];
+        if (best > 0) { hit += tokW[i]; sum += best * tokW[i]; }
+      }
+      if (!hit) continue;
+      var cov = hit / totalW;
+      if (qt.length >= 2 && cov < 0.5) continue;
+      var score = sum * cov * cov;
+      if (phrase && d.norm.indexOf(phrase) >= 0) score += d.norm.lastIndexOf(phrase, 0) === 0 ? 3 : 2;
+      var tf = TYPE[d.type];
+      if (d.type === 'calc' && wantCalc) tf *= 1.9;
+      if (d.type === 'answer' && question) tf *= 1.5;
+      score *= tf;
+      if (d.type === 'article') score += Math.log(1 + d.pop) / Math.LN10 * 0.06;
+      scored.push({ d: d, score: score, cov: cov, strongQ: strongQ });
+    }
+    scored.sort(function (x, y) { return y.score - x.score; });
+    var strongN = qt.filter(function (q) { return q.length > 1; }).length;
+    return group(index, scored, res, { question: question, wantCalc: wantCalc, n: qt.length, strongN: strongN });
+  }
+
+  function group(index, scored, res, ctx) {
+    var by = { topic: [], article: [], calc: [], section: [], answer: [] };
+    scored.forEach(function (r) { by[r.d.type].push(r); });
+    var agg = new Map();
+    scored.forEach(function (r) {
+      if (!r.d.a) return;
+      var cur = agg.get(r.d.a);
+      if (!cur) { cur = { a: r.d.a, score: 0, own: 0, hits: [] }; agg.set(r.d.a, cur); }
+      var val = r.d.type === 'article' ? r.score : r.score * 0.8;
+      if (val > cur.score) cur.score = val;
+      if (r.d.type === 'article') cur.own = r.score;
+      else if (r.d.type !== 'answer' && cur.hits.length < 2) cur.hits.push(r.d);
+    });
+    var arts = Array.from(agg.values()).sort(function (x, y) { return y.score - x.score; });
+    var aTop = arts.length ? arts[0].score : 0;
+    res.articles = arts.filter(function (x) { return x.score >= aTop * 0.3; });
+    // Direkte Antwort nur, wenn die Frage selbst alle starken Suchwoerter traegt
+    var bestAns = null;
+    for (var ai = 0; ai < Math.min(by.answer.length, 6); ai++) {
+      var r = by.answer[ai];
+      var qWords = index.answerWords(r.d);
+      var specific = ctx.strongN >= 2 || qWords <= 3;
+      if (r.strongQ >= ctx.strongN && specific) { bestAns = r; break; }
+    }
+    if (bestAns && (ctx.question || ctx.n >= 3) && bestAns.score >= aTop * 0.5) res.answer = bestAns.d;
+    var cTop = by.calc.length ? by.calc[0].score : 0;
+    res.calcs = by.calc.filter(function (r) { return r.score >= cTop * 0.55 && r.score >= aTop * 0.25; })
+      .slice(0, ctx.wantCalc ? 8 : 3).map(function (r) { return r.d; });
+    if (ctx.wantCalc && !res.calcs.length && res.articles.length) {
+      // gesuchter Rechner existiert nicht: Rechner aus demselben Thema anbieten
+      var t = index.art[res.articles[0].a].topic;
+      res.calcTopic = index.topic[t];
+      res.calcs = index.data.articles.filter(function (a) { return a.topic === t && a.calc; }).slice(0, 4)
+        .map(function (a) { return { type: 'calc', a: a.slug, title: a.calc.h, anchor: a.calc.anchor }; });
+    }
+    if (by.topic.length && by.topic[0].score >= aTop * 0.7 && by.topic[0].cov === 1) res.topic = by.topic[0].d;
+    if (res.topic && by.topic[0].score >= aTop) {
+      // Beitraege dieses Themas nach vorne, in Lernpfad-Reihenfolge
+      var tid = res.topic.topic, inT = [], outT = [];
+      res.articles.forEach(function (x) { (index.art[x.a].topic === tid ? inT : outT).push(x); });
+      index.data.articles.forEach(function (a) {
+        if (a.topic === tid && !inT.some(function (x) { return x.a === a.slug; })) inT.push({ a: a.slug, score: 0, hits: [] });
+      });
+      inT.sort(function (x, y) { return index.art[x.a].order - index.art[y.a].order; });
+      res.articles = inT.concat(outT);
+    }
+    res.sections = by.section.filter(function (r) { return r.score >= aTop * 0.3; }).slice(0, 4).map(function (r) { return r.d; });
+    res.answers = by.answer.filter(function (r) { return r.d !== res.answer && r.cov >= 0.6 && r.score >= aTop * 0.3; })
+      .slice(0, 5).map(function (r) { return r.d; });
+    return res;
+  }
+
+  /* naechste Themen fuer "kein Treffer": Tippfehler-Abstand zu Themen- und Beitragsnamen */
+  function nearest(index, raw) {
+    var qt = tokens(raw);
+    if (!qt.length) return [];
+    var out = [];
+    index.data.articles.forEach(function (a) {
+      var words = tokens(a.title + ' ' + a.kw);
+      var best = 0;
+      qt.forEach(function (q) {
+        words.forEach(function (w) {
+          if (q.length < 3) return;
+          if (q[0] !== w[0]) {
+            // falscher Anfangsbuchstabe: nur bei langen Woertern mit genau einem Fehler
+            if (q.length >= 7 && osa(q, w, 1) === 1) best = Math.max(best, 1 - 1 / Math.max(q.length, w.length));
+            return;
+          }
+          var d = osa(q, w, 3);
+          if (d >= 0) best = Math.max(best, 1 - d / Math.max(q.length, w.length));
+          else if (w.indexOf(q.slice(0, 3)) === 0) best = Math.max(best, 0.3);
+        });
+      });
+      if (best >= 0.6) out.push({ a: a.slug, s: best });
+    });
+    return out.sort(function (x, y) { return y.s - x.s; }).slice(0, 3).map(function (x) { return x.a; });
+  }
+
+  return { build: build, search: search, fold: fold, tokens: tokens, nearest: nearest, LEVELS: LEVELS };
+})();
+if (typeof module !== 'undefined') module.exports = OMBS_ENGINE;
+</script>

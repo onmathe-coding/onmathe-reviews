@@ -1,0 +1,463 @@
+<!-- OnMathe Blog-Hub 1/3: Stil, Startwerte, Grundgeruest. Danach folgen die CMS-Liste obs-data, Embed 2 (Suchlogik) und Embed 3 (Oberflaeche). -->
+<script data-cookieconsent="ignore">
+(function (d) {
+  d.classList.add("obs-on");
+  document.addEventListener("DOMContentLoaded", function () { if (!window.OMBS_UI_OK) d.classList.remove("obs-on"); });
+})(document.documentElement);
+window.OMBS_STATIC={
+ "topics":[
+  ["geometrie","Geometrie","Flächen, Körper und rechtwinklige Dreiecke","a^2+b^2=c^2"],
+  ["terme-gleichungen","Terme & Gleichungen","Umformen, Klammern auflösen, Definitionsmenge","(a+b)^2"],
+  ["lineare-funktionen-lgs","Lineare Funktionen & LGS","Geraden und lineare Gleichungssysteme","y=mx+b"],
+  ["quadratische-gleichungen","Quadratische Gleichungen","Parabeln, Scheitelpunkt und Lösungsformeln","x^2+px+q=0"],
+  ["potenzen-logarithmen","Potenzen & Logarithmen","Rechenregeln und Exponentialgleichungen","\\log_2 8=3"],
+  ["ableitungen","Ableitungen","Von der Steigung bis zur Kettenregel","f'(x)"],
+  ["kurvendiskussion","Kurvendiskussion","Symmetrie, Nullstellen, Extrem- und Wendepunkte","f''(x_0)=0"],
+  ["integralrechnung","Integralrechnung","Stammfunktionen und Flächen","\\int_a^b f(x)\\,dx"],
+  ["stochastik","Stochastik","Kombinatorik und Binomialverteilung","P(X=k)"]
+ ],
+ "kw":{
+  "exponentialgleichungen-losen":"exponentialgleichung exponentialfunktion e-funktion exponent hoch wachstum zerfall",
+  "gleichungen-loesen":"gleichung umstellen auflösen umformen äquivalenzumformung lineare gleichung x berechnen",
+  "stammfunktionen-bilden":"stammfunktion aufleiten integrieren integral unbestimmtes integral",
+  "definitionsmenge":"definitionsbereich definitionslücke wurzel bruch nenner",
+  "hauptsatz-integral-differential":"integral integrieren bestimmtes integral fläche unter der kurve flächeninhalt integralrechnung",
+  "scheitelpunktform":"scheitelpunkt scheitel parabel verschieben normalparabel",
+  "quadratische-erganzung":"quadratische ergänzung scheitelpunkt parabel",
+  "satz-von-vieta":"vieta nullstellen raten linearfaktoren",
+  "tangentengleichung":"tangente tangentengleichung normale berührpunkt steigung punkt",
+  "satz-des-pythagoras":"pythagoras hypotenuse kathete rechtwinklig a²+b²=c²",
+  "binomische-formeln":"binomische formel ausmultiplizieren faktorisieren klammer auflösen (a+b)²",
+  "differenzenquotient":"steigung änderungsrate sekante h-methode differentialquotient",
+  "permutation":"permutation fakultät anordnungen reihenfolge möglichkeiten",
+  "kombinatorik-formeln":"kombinatorik möglichkeiten anzahl urne zurücklegen binomialkoeffizient n über k",
+  "lgs-zeichnerisch-loesen":"lgs gleichungssystem schnittpunkt geraden zeichnerisch grafisch",
+  "lineare-funktionen":"gerade geradengleichung steigung achsenabschnitt y=mx+b steigungsdreieck zwei punkte",
+  "additionsverfahren":"addieren lgs gleichungssystem eliminieren",
+  "einsetzungsverfahren":"einsetzen lgs gleichungssystem",
+  "gleichsetzungsverfahren":"gleichsetzen lgs gleichungssystem",
+  "wendepunkte-kruemmung":"wendepunkt wendestelle krümmung sattelpunkt linkskurve rechtskurve",
+  "logarithmus":"logarithmus log ln lg logarithmieren natürlicher logarithmus",
+  "bernoulli-binomialverteilung":"bernoulli bernoullikette treffer wahrscheinlichkeit n über k",
+  "binomialverteilung":"binomialverteilung binomialverteilt kumuliert höchstens mindestens wahrscheinlichkeit taschenrechner",
+  "binomialverteilung-erwartungswert-standardabweichung":"erwartungswert standardabweichung varianz sigma",
+  "logarithmusgesetze":"logarithmusgesetze logarithmusregeln log regeln basiswechsel",
+  "die-mitternachtsformel":"mitternachtsformel abc formel abc-formel lösungsformel quadratische gleichung diskriminante",
+  "extrempunkte-und-monotonie":"extrempunkt extremstelle hochpunkt tiefpunkt maximum minimum monotonie steigt fällt",
+  "horner-schema":"horner hornerschema polynom nullstellen",
+  "ableiten-tipps-und-tricks":"ableiten tricks wurzel bruch umschreiben",
+  "substitution":"substitution biquadratisch x hoch 4 nullstellen",
+  "polynomdivision":"polynomdivision polynom teilen linearfaktor nullstelle raten",
+  "quotientenregel":"quotientenregel bruch ableiten",
+  "produktregel":"produktregel produkt ableiten",
+  "die-pq-formel":"pq formel p-q-formel quadratische gleichung parabel nullstellen",
+  "potenzgesetze":"potenz potenzen potenzregeln hochzahl exponent hoch wurzel",
+  "die-kettenregel":"kettenregel verkettung verkettet innere äußere ableitung e hoch x sinus kosinus wurzel",
+  "symmetrie-ganzrational":"symmetrie achsensymmetrie punktsymmetrie gerade ungerade funktion",
+  "verhalten-im-unendlichen":"grenzverhalten grenzwert limes globalverlauf unendlich",
+  "quader-volumen-oberflaeche":"quader würfel volumen oberfläche raumdiagonale rauminhalt körper",
+  "nullstellen-arten-vielfachheit":"nullstellen vielfachheit doppelte nullstelle vorzeichenwechsel nullstellenform",
+  "nullstellen-einstieg":"nullstelle nullstellen schnittpunkt x-achse parabel gerade",
+  "kreis-flaeche-umfang":"kreis kreisfläche kreisumfang pi radius durchmesser",
+  "rechteck-umfang-flaeche":"rechteck quadrat flächeninhalt umfang seitenlänge",
+  "dreieck-flaeche-umfang":"dreieck dreiecksfläche höhe grundseite umfang",
+  "ableitungsregeln":"ableiten ableitung ableitungsregeln differenzieren potenzregel",
+  "ableitung-faktor-und-summenregel":"faktorregel summenregel ableiten potenzregel"
+ },
+ "calc":{
+  "gleichungen-loesen":["Gleichungen lösen: Rechner mit Rechenweg","gleichungen-loesen-rechner-rechenweg"],
+  "stammfunktionen-bilden":["Stammfunktion Rechner mit Rechenweg","stammfunktionen-rechner-rechenweg"],
+  "definitionsmenge":["Definitionsmenge Rechner mit Rechenweg","definitionsmenge-rechner-rechenweg"],
+  "hauptsatz-integral-differential":["Integralrechner mit Rechenweg","integral-rechner-rechenweg"],
+  "scheitelpunktform":["Scheitelpunktform-Rechner mit Rechenweg und Graph","scheitelpunktform-rechner"],
+  "quadratische-erganzung":["Quadratische Ergänzung Rechner mit Rechenweg","quad-erg-rechner"],
+  "satz-von-vieta":["Satz von Vieta Rechner mit Rechenweg","vieta-rechner-rechenweg"],
+  "tangentengleichung":["Rechner - Tangentengleichung","tangentengleichung-rechner"],
+  "satz-des-pythagoras":["Pythagoras Rechner","pythagoras-rechner"],
+  "binomische-formeln":["Rechner - Binomische Formeln","binomische-formeln-rechner"],
+  "permutation":["Permutation-Rechner mit Rechenweg","rechner-permutation"],
+  "kombinatorik-formeln":["Kombinatorik-Rechner: Welche Formel passt?","kombinatorik-rechner-formel"],
+  "lgs-zeichnerisch-loesen":["LGS-Rechner mit Zeichnung und Rechenweg","lgs-rechner"],
+  "lineare-funktionen":["Geradengleichung-Rechner: Funktion aus zwei Punkten aufstellen","geradengleichung-rechner"],
+  "additionsverfahren":["Additionsverfahren-Rechner mit Rechenweg","rechner-additionsverfahren"],
+  "einsetzungsverfahren":["Einsetzungsverfahren-Rechner mit Rechenweg","rechner-einsetzungsverfahren"],
+  "gleichsetzungsverfahren":["Gleichsetzungsverfahren-Rechner mit Rechenweg","rechner-gleichsetzungsverfahren"],
+  "wendepunkte-kruemmung":["Wendepunkt-Rechner: Wendepunkte und Krümmung berechnen","wendepunkt-rechner"],
+  "logarithmus":["Logarithmus-Rechner: Logarithmus berechnen mit Rechenweg","logarithmus-rechner"],
+  "bernoulli-binomialverteilung":["Bernoulli-Rechner mit Rechenweg","bernoulli-formel-rechner"],
+  "binomialverteilung":["Binomialverteilung Rechner mit Histogramm","binomialverteilung-rechner-histogramm"],
+  "binomialverteilung-erwartungswert-standardabweichung":["Rechner für Erwartungswert und Standardabweichung","erwartungswert-rechner"],
+  "extrempunkte-und-monotonie":["Extrempunkte-Rechner mit Rechenweg und Graph","extrempunkte-rechner"],
+  "horner-schema":["Horner-Schema Rechner mit Rechenweg","horner-schema-rechner"],
+  "ableiten-tipps-und-tricks":["Ableitungs-Rechner: Brüche und Wurzeln ableiten","ableiten-rechner"],
+  "polynomdivision":["Polynomdivision-Rechner mit Rechenweg","polynomdivision-rechner"],
+  "quotientenregel":["Quotientenregel-Rechner: Ableitung mit Rechenweg","quotientenregel-rechner"],
+  "produktregel":["Produktregel-Rechner: Ableitung mit Rechenweg","produktregel-rechner"],
+  "die-pq-formel":["pq-Formel Rechner mit Rechenweg","pq-formel-rechner"],
+  "potenzgesetze":["Potenzrechner: Potenzen berechnen mit Rechenweg","potenzrechner"],
+  "die-kettenregel":["Kettenregel-Rechner: Ableitung mit Rechenweg","kettenregel-rechner"],
+  "symmetrie-ganzrational":["Symmetrie-Rechner mit Rechenweg und Graph","symmetrie-rechner"],
+  "verhalten-im-unendlichen":["Grenzverhalten-Rechner mit Rechenweg","rechner-verhalten-im-unendlichen"],
+  "quader-volumen-oberflaeche":["Quader-Rechner: Volumen, Oberfläche und Raumdiagonale","quader-rechner"],
+  "nullstellen-arten-vielfachheit":["Nullstellen-Rechner: Vielfachheit und Nullstellenform berechnen","nullstellen-vielfachheit-rechner"],
+  "nullstellen-einstieg":["Nullstellen-Rechner mit Rechenweg und Graph","nullstellen-rechner"],
+  "kreis-flaeche-umfang":["Kreis-Rechner: Fläche, Umfang, Radius und Durchmesser","kreis-rechner"],
+  "rechteck-umfang-flaeche":["Rechteck-Rechner: Umfang, Flächeninhalt und Seiten","rechteck-rechner"],
+  "dreieck-flaeche-umfang":["Dreieck-Rechner: Flächeninhalt, Umfang und Höhe","dreieck-rechner"],
+  "ableitung-faktor-und-summenregel":["Ableitungsrechner: Faktor- und Summenregel mit Rechenweg","ableitungsrechner"]
+ },
+ "faq":{
+  "exponentialgleichungen-losen":5,
+  "gleichungen-loesen":6,
+  "stammfunktionen-bilden":7,
+  "definitionsmenge":7,
+  "hauptsatz-integral-differential":5,
+  "scheitelpunktform":3,
+  "quadratische-erganzung":7,
+  "satz-von-vieta":5,
+  "tangentengleichung":7,
+  "satz-des-pythagoras":6,
+  "binomische-formeln":7,
+  "differenzenquotient":7,
+  "permutation":8,
+  "kombinatorik-formeln":7,
+  "lgs-zeichnerisch-loesen":7,
+  "lineare-funktionen":7,
+  "additionsverfahren":8,
+  "einsetzungsverfahren":8,
+  "gleichsetzungsverfahren":8,
+  "wendepunkte-kruemmung":7,
+  "logarithmus":7,
+  "bernoulli-binomialverteilung":7,
+  "binomialverteilung":7,
+  "binomialverteilung-erwartungswert-standardabweichung":8,
+  "logarithmusgesetze":7,
+  "die-mitternachtsformel":7,
+  "extrempunkte-und-monotonie":7,
+  "horner-schema":7,
+  "ableiten-tipps-und-tricks":7,
+  "substitution":7,
+  "polynomdivision":7,
+  "quotientenregel":7,
+  "produktregel":7,
+  "die-pq-formel":7,
+  "potenzgesetze":7,
+  "die-kettenregel":7,
+  "symmetrie-ganzrational":7,
+  "verhalten-im-unendlichen":7,
+  "quader-volumen-oberflaeche":7,
+  "nullstellen-arten-vielfachheit":7,
+  "nullstellen-einstieg":7,
+  "kreis-flaeche-umfang":7,
+  "rechteck-umfang-flaeche":7,
+  "dreieck-flaeche-umfang":7,
+  "ableitungsregeln":7,
+  "ableitung-faktor-und-summenregel":7
+ },
+ "clicks":{
+  "binomische-formeln":960,
+  "lineare-funktionen":1339,
+  "logarithmus":1059,
+  "logarithmusgesetze":812,
+  "horner-schema":552,
+  "polynomdivision":2083,
+  "potenzgesetze":745,
+  "die-kettenregel":547,
+  "ableitungsregeln":1193
+ },
+ "answers":315,
+ "popular":["polynomdivision","lineare-funktionen","ableitungsregeln","logarithmus","binomische-formeln"],
+ "popLabel":{
+  "polynomdivision":"Polynomdivision",
+  "lineare-funktionen":"Lineare Funktionen",
+  "ableitungsregeln":"Ableitungsregeln",
+  "logarithmus":"Logarithmus",
+  "binomische-formeln":"Binomische Formeln"
+ }
+};
+</script>
+<link rel="preconnect" href="https://gregor346.github.io" crossorigin>
+<link rel="stylesheet" href="https://gregor346.github.io/katex-files/katex.min.css">
+<script defer src="https://gregor346.github.io/katex-files/katex.min.js" id="obs-katex" data-cookieconsent="ignore"></script>
+<style>
+/* OnMathe Blog-Hub /blog: Suche, Themenkarten, Lernpfade.
+   Alle Regeln sind auf .obs-hub bzw. obs-Klassen begrenzt, das globale Stylesheet bleibt unberuehrt. */
+:root{--obs-nav-h:74px;--obs-band-h:80px}
+html{scroll-padding-top:calc(var(--obs-nav-h) + var(--obs-band-h) + 12px)}
+html.obs-lock{overflow:hidden}
+html:not(.obs-on) .obs-js{display:none!important}
+html.obs-on .section-blog-posts,#obs-data{display:none!important}
+
+.obs-hub{
+  --ink:#1c2638;--ink-2:#34405a;--muted:#5b6578;--line:#e3e7ee;--soft:#f6f7f9;
+  --paper:#fff;--accent:#ff8a00;--accent-ink:#a35200;--accent-tint:#fff4e8;
+  --hi:rgba(255,138,0,.28);--green:#25853a;
+  position:relative;color:var(--ink);font-size:16px;line-height:1.55;font-weight:400;
+  -webkit-font-smoothing:antialiased;text-align:left
+}
+.obs-hub *,.obs-hub *::before,.obs-hub *::after{box-sizing:border-box}
+.obs-hub h1,.obs-hub h2,.obs-hub h3,.obs-hub p,.obs-hub ol,.obs-hub ul,.obs-hub form,.obs-hub label{margin:0}
+.obs-hub ol,.obs-hub ul{padding:0;list-style:none}
+.obs-hub h1,.obs-hub h2,.obs-hub h3{font-family:inherit;color:inherit}
+.obs-hub a{color:var(--accent-ink)}
+.obs-hub button{font:inherit;color:inherit;margin:0;line-height:inherit;text-transform:none}
+.obs-hub input{margin:0;font:inherit;line-height:normal}
+.obs-hub :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.obs-sr{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.obs-wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.obs-svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.obs-clear[hidden],.obs-panel[hidden]{display:none}
+
+/* Marker */
+.obs-bar{display:block;width:100%;height:5px;margin-top:5px;border-radius:3px;background:var(--accent);opacity:.85}
+.obs-answer .ex strong{font-weight:700;background:linear-gradient(transparent 58%,var(--hi) 58%);padding:0 2px;border-radius:2px}
+
+/* Kopfbereich mit dem Blog-Foto */
+.obs-photo{position:absolute;z-index:0;top:16px;height:360px;left:max(16px,calc((100% - 1088px) / 2));right:max(16px,calc((100% - 1088px) / 2));border-radius:24px;overflow:hidden;background:var(--ink)}
+.obs-photo img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center 30%}
+.obs-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(28,38,56,.55) 0%,rgba(28,38,56,.72) 100%),linear-gradient(45deg,rgba(158,74,0,.5) 0%,rgba(158,74,0,0) 60%)}
+.obs-hero,.obs-searchwrap,.obs-after,.obs-band,.obs-content{position:relative;z-index:1}
+.obs-hero{text-align:center;padding-top:76px;padding-bottom:18px;color:#fff}
+.obs-hub .obs-h1{font-size:clamp(38px,5.4vw,58px);line-height:1.05;font-weight:800;letter-spacing:-.03em;color:#fff}
+.obs-mark{position:relative;display:inline-block;padding:0 .08em;isolation:isolate}
+.obs-mark::after{content:"";position:absolute;left:0;right:0;bottom:.04em;height:.2em;border-radius:4px;background:var(--accent);opacity:.85;z-index:-1}
+.obs-hub .obs-hero-sub{margin-top:16px;font-size:18px;line-height:1.5;color:rgba(255,255,255,.9)}
+
+/* Suchleiste: bleibt beim Scrollen unter der Kopfzeile stehen */
+.obs-searchwrap{position:sticky;top:var(--obs-nav-h);z-index:40;padding-top:12px;padding-bottom:12px}
+.obs-searchwrap::before{content:"";position:absolute;inset:0;background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 12px 24px -22px rgba(28,38,56,.5);opacity:0;transition:opacity .15s}
+.obs-searchwrap.is-stuck::before{opacity:1}
+.obs-shell{position:relative;max-width:808px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.obs-search{position:relative}
+.obs-row{display:flex;align-items:center;gap:10px}
+.obs-hub .obs-form{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:64px;padding:0 8px 0 20px;background:var(--paper);border:2px solid transparent;border-radius:18px;box-shadow:0 18px 40px -18px rgba(0,0,0,.5);transition:border-color .15s,box-shadow .15s,height .15s}
+.obs-hub .obs-form:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px rgba(255,138,0,.25),0 18px 40px -18px rgba(0,0,0,.5)}
+.obs-searchwrap.is-stuck .obs-form{height:52px;border:1.5px solid var(--ink);box-shadow:none}
+.obs-form > .obs-svg{width:20px;height:20px;color:var(--ink)}
+.obs-hub .obs-form input{flex:1;min-width:0;width:auto;height:100%;padding:0;border:0;outline:0;background:transparent;box-shadow:none;font-size:17px;color:var(--ink);-webkit-appearance:none;appearance:none}
+.obs-form input::placeholder{color:#6b7486;opacity:1}
+.obs-form input::-webkit-search-cancel-button,.obs-form input::-webkit-search-decoration{display:none;-webkit-appearance:none}
+.obs-clear{width:38px;height:38px;padding:0;border:0;border-radius:10px;background:transparent;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
+.obs-clear:hover{background:var(--soft)}
+.obs-go{height:46px;padding:0 20px;border:0;border-radius:13px;background:var(--accent);color:var(--ink);font-weight:700;font-size:15px;cursor:pointer}
+.obs-go:hover{background:#ff9a26}
+.obs-searchwrap.is-stuck .obs-go{height:38px;border-radius:10px}
+.obs-cancel{display:none;height:44px;padding:0 6px;border:0;background:transparent;font-weight:600;color:var(--accent-ink);cursor:pointer}
+.obs-chips{display:none;gap:8px;overflow-x:auto;padding-top:10px;scrollbar-width:none}
+.obs-chips::-webkit-scrollbar{display:none}
+.obs-searchwrap.is-stuck .obs-chips{display:flex}
+.obs-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font-weight:500;font-size:14px;line-height:1;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+.obs-chip:hover{border-color:var(--accent)}
+.obs-chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-tint);color:var(--accent-ink)}
+.obs-chip .obs-svg{width:16px;height:16px}
+
+/* Vorschlagsliste */
+.obs-panel{position:absolute;left:0;right:0;top:calc(100% + 8px);background:var(--paper);border:1px solid var(--line);border-radius:18px;box-shadow:0 30px 60px -30px rgba(28,38,56,.5);max-height:min(72vh,660px);overflow:auto;padding:8px;text-align:left;overscroll-behavior:contain}
+.obs-g + .obs-g{border-top:1px solid var(--line);margin-top:4px;padding-top:4px}
+.obs-gh{font-weight:600;font-size:12.5px;line-height:1.3;color:var(--muted);padding:8px 10px 4px}
+.obs-opt{display:flex;gap:12px;align-items:flex-start;width:100%;padding:9px 10px;border:0;border-radius:10px;background:transparent;text-align:left;text-decoration:none;color:var(--ink);cursor:pointer}
+.obs-hub a.obs-opt{color:var(--ink)}
+.obs-opt:hover,.obs-opt.is-active{background:var(--soft)}
+.obs-ic{flex:0 0 32px;height:32px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;background:var(--soft);color:var(--ink-2)}
+.obs-opt:hover .obs-ic,.obs-opt.is-active .obs-ic{background:var(--paper)}
+.obs-opt.is-calc .obs-ic{background:var(--accent-tint);color:var(--accent-ink)}
+.obs-ot{min-width:0;display:flex;flex-direction:column;gap:2px}
+.obs-ot .t{font-weight:600;font-size:15px;line-height:1.3}
+.obs-ot .s{font-size:13px;line-height:1.35;color:var(--muted)}
+.obs-hub mark{background:var(--hi);color:inherit;border-radius:3px;padding:0 1px}
+.obs-answer{position:relative;margin:6px 4px 8px;padding:16px 18px 14px;border:1px solid #ffd7ad;background:var(--accent-tint);border-radius:16px}
+.obs-answer .lbl{display:flex;align-items:center;gap:10px;font-size:13px;line-height:1.3;color:var(--ink-2)}
+.obs-answer .q{font-weight:700;font-size:16.5px;line-height:1.35;margin:10px 0 6px}
+.obs-answer .ex{font-size:15px;line-height:1.6;color:var(--ink-2)}
+.obs-dmath{display:block;margin:6px 0;overflow-x:auto;overflow-y:hidden}
+.obs-dmath .katex-display{margin:0}
+.obs-hub .obs-more{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:4px 0;font-weight:600;font-size:14px;color:var(--accent-ink);text-decoration:none;border-radius:6px}
+.obs-more.is-active{text-decoration:underline;text-underline-offset:3px}
+.obs-avs{display:inline-flex;flex:0 0 auto}
+.obs-av{width:30px;height:30px;border-radius:50%;border:2px solid var(--paper);background:var(--soft) center/cover no-repeat;display:inline-block}
+.obs-av + .obs-av{margin-left:-9px}
+.obs-avs.lg .obs-av{width:40px;height:40px;border-width:3px}
+.obs-avs.lg .obs-av + .obs-av{margin-left:-12px}
+.obs-av-lisa{background-image:url(https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6730e2c4670a95670f30f47a_home_lisa-p-500.webp)}
+.obs-av-gregor{background-image:url(https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6730e2686a1d283e6db069f6_home_gregor-p-500.webp)}
+.obs-pfoot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 10px 4px;border-top:1px solid var(--line);margin-top:4px;font-size:13px;color:var(--muted)}
+.obs-all{border:1px solid var(--line);background:var(--paper);border-radius:999px;height:34px;padding:0 14px;font-weight:600;font-size:13.5px;color:var(--ink);cursor:pointer}
+.obs-all.is-active,.obs-all:hover{border-color:var(--accent);color:var(--accent-ink)}
+.obs-zero{padding:10px 10px 6px}
+.obs-zero .z1{margin:0 0 4px;font-weight:600}
+.obs-cta{position:relative;margin-top:14px;padding:18px;border-radius:16px;background:var(--ink);color:#fff}
+.obs-cta .t{display:block;font-weight:700;font-size:16px;margin-bottom:4px}
+.obs-hub .obs-cta p{line-height:1.5}
+.obs-hub .obs-btn{display:inline-flex;align-items:center;gap:8px;margin-top:12px;height:44px;padding:0 18px;border-radius:999px;background:var(--accent);color:var(--ink);font-weight:700;font-size:15px;text-decoration:none}
+.obs-btn.is-active{outline:2px solid #fff;outline-offset:2px}
+
+/* Oft gesucht, Autoren */
+.obs-after{text-align:center;padding-top:4px}
+.obs-popular{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-top:16px}
+.obs-popular .lbl{font-size:14px;font-weight:600;color:rgba(255,255,255,.92);margin-right:2px}
+.obs-q{font-style:italic}
+.obs-byline{display:flex;align-items:center;justify-content:center;gap:12px;margin:58px auto 0;max-width:720px;font-size:14.5px;line-height:1.45;color:var(--muted);text-align:left}
+.obs-byline strong{color:var(--ink);font-weight:700}
+
+/* Themenkarten */
+.obs-band{background:var(--soft);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:36px}
+.obs-topics{padding-top:40px;padding-bottom:44px}
+.obs-hub .obs-h2{margin:0 0 18px;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-wrap:balance}
+.obs-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:14px}
+.obs-tile{container-type:inline-size;display:flex;flex-direction:column;padding:0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--paper);text-align:left;cursor:pointer;box-shadow:0 1px 2px rgba(28,38,56,.05);transition:border-color .15s,box-shadow .15s}
+.obs-tile:hover{border-color:#ffc685;box-shadow:0 14px 28px -20px rgba(28,38,56,.4)}
+.obs-tile[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.obs-cover{display:flex;flex-direction:column;align-items:flex-start;height:128px;padding:12px 12px 8px 14px;border-bottom:1px solid var(--line);color:var(--ink)}
+.obs-cover-f{display:inline-flex;flex-direction:column;gap:1px;font-size:17px;line-height:1.2;white-space:nowrap;min-height:1.6em}
+.obs-cover-f .katex-html{white-space:nowrap}
+.obs-cover .obs-k{visibility:hidden}
+.obs-hub.is-plain .obs-cover .obs-k{visibility:visible;font-style:italic;font-family:"Times New Roman",serif}
+.obs-cover-g{flex:1 1 auto;width:100%;min-height:0;margin-top:4px}
+.obs-tbody{display:flex;flex-direction:column;gap:3px;padding:12px 14px 14px}
+.obs-tbody .n{font-weight:700;font-size:16px;line-height:1.25}
+.obs-tbody .m{font-size:13px;line-height:1.35;color:var(--muted)}
+.obs-tile.is-calc .obs-cover{flex-direction:row;align-items:center;justify-content:space-between;background:var(--ink);color:#fff;border-bottom-color:var(--ink)}
+.obs-tile.is-calc .obs-cover .obs-svg{width:40px;height:40px;color:var(--accent);stroke-width:1.8}
+.obs-tile.is-calc .obs-calcnote{font-weight:600;font-size:14px;color:#fff;opacity:.9}
+@container (max-width:190px){.obs-cover{height:120px;padding:10px 10px 6px 12px}.obs-cover-f{font-size:14px}}
+/* Skizzen in den Karten */
+.obs-hub .g-ax{stroke:var(--ink);opacity:.2;stroke-width:1.2;fill:none}
+.obs-hub .g-ln{stroke:var(--ink);stroke-width:2.4;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.obs-hub .g-ln2{stroke:var(--ink);stroke-width:1.8;fill:none;stroke-dasharray:4 4;opacity:.5}
+.obs-hub .g-mk{stroke:var(--accent);stroke-width:6;fill:none;stroke-linecap:round;opacity:.55}
+.obs-hub .g-tan{stroke:var(--accent);stroke-width:2.6;fill:none;stroke-linecap:round}
+.obs-hub .g-ci{stroke:var(--accent);stroke-width:2.2;fill:none;stroke-linecap:round}
+.obs-hub .g-pt{fill:var(--ink)}.obs-hub .g-po{fill:var(--accent)}.obs-hub .g-pg{fill:var(--green)}
+.obs-hub .g-ar{fill:var(--accent);opacity:.24}
+.obs-hub .g-fi{fill:var(--ink);opacity:.06}
+.obs-hub .g-bar{fill:var(--ink);opacity:.16}
+.obs-hub .g-baro{fill:var(--accent)}
+.obs-hub .g-lb{font:italic 11px KaTeX_Math,"Times New Roman",serif;fill:var(--ink-2)}
+
+/* Inhalt: Lernpfade, Rechner, Treffer */
+.obs-content{outline:none;padding-bottom:56px}
+.obs-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-top:28px}
+.obs-filterbar .lbl{font-size:14px;color:var(--muted)}
+.obs-filterbar strong{font-weight:700}
+.obs-reset{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-weight:600;font-size:14px;cursor:pointer}
+.obs-reset:hover{border-color:var(--accent);color:var(--accent-ink)}
+.obs-tsec{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px 48px;padding-top:44px;padding-bottom:44px;border-top:1px solid var(--line)}
+.obs-tsec.is-first{border-top:0}
+.obs-thead{position:sticky;top:calc(var(--obs-nav-h) + var(--obs-band-h) + 20px);align-self:start}
+.obs-thead .obs-cover{flex-direction:row;align-items:center;justify-content:space-between;height:120px;border:1px solid var(--line);border-radius:16px;background:var(--paper);padding:14px 12px 12px 16px}
+.obs-thead .obs-cover-g{flex:0 0 48%;width:auto;height:100%;margin:0}
+.obs-thead .obs-cover-f{font-size:21px}
+.obs-hub .obs-thead h2{margin:18px 0 6px;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.obs-hub .obs-thead p{color:var(--muted);line-height:1.55}
+.obs-hub .obs-thead .m{margin-top:10px;font-size:13.5px}
+.obs-step{position:relative;display:grid;grid-template-columns:38px minmax(0,1fr);gap:14px;padding:14px 14px 14px 8px;border-radius:14px}
+.obs-step:hover{background:var(--soft)}
+.obs-step:not(:last-child)::before{content:"";position:absolute;left:25px;top:50px;bottom:-12px;border-left:2px dotted #c9d0db}
+.obs-n{position:relative;z-index:1;width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--accent);border-radius:50%;background:var(--paper)}
+.obs-n b{font-weight:700;font-size:15px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink)}
+.obs-body{min-width:0;padding-top:6px}
+.obs-hub .obs-title{font-weight:700;font-size:17px;line-height:1.3;color:var(--ink);text-decoration:none}
+.obs-title::after{content:"";position:absolute;inset:0;border-radius:14px}
+.obs-hub .obs-title:focus-visible{outline:none}
+.obs-title:focus-visible::after{outline:2px solid var(--accent);outline-offset:2px}
+.obs-step:hover .obs-title{text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:4px}
+.obs-hub .obs-desc{margin-top:4px;font-size:14.5px;line-height:1.5;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.obs-meta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:9px;font-size:13px;line-height:1.4;color:var(--muted)}
+.obs-meta .obs-avs .obs-av{width:24px;height:24px;border-width:2px}
+.obs-meta .obs-avs .obs-av + .obs-av{margin-left:-7px}
+.obs-by{display:inline-flex;align-items:center;gap:7px}
+.obs-hub .obs-calc{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;min-height:30px;padding:0 12px;border-radius:999px;border:1.5px solid var(--accent);background:var(--paper);color:var(--accent-ink);font-weight:700;font-size:13px;text-decoration:none}
+.obs-calc:hover{background:var(--accent-tint)}
+.obs-calc .obs-svg{width:15px;height:15px}
+.obs-hits{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.obs-hub .obs-hit{position:relative;z-index:2;display:inline-flex;align-items:center;gap:6px;font-size:14px;line-height:1.45;color:var(--ink-2);text-decoration:none;width:fit-content;max-width:100%}
+.obs-hub .obs-hit:hover{color:var(--accent-ink);text-decoration:underline;text-underline-offset:3px}
+.obs-hit .obs-svg{width:14px;height:14px;color:var(--muted)}
+.obs-calcgroup{padding-top:22px;padding-bottom:4px}
+.obs-hub .obs-calcgroup h3{margin:0 0 10px;font-size:16px;line-height:1.3;font-weight:700}
+.obs-calcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+.obs-hub .obs-calcitem{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid var(--line);border-radius:14px;color:var(--ink);text-decoration:none;background:var(--paper)}
+.obs-calcitem:hover{border-color:var(--accent);background:var(--accent-tint)}
+.obs-calcitem .obs-ic{background:var(--accent-tint);color:var(--accent-ink)}
+.obs-calcitem .t{display:block;font-weight:600;font-size:15px;line-height:1.3}
+.obs-calcitem .s{display:block;font-size:13px;line-height:1.35;color:var(--muted);margin-top:2px}
+.obs-rhead{padding-top:28px;padding-bottom:6px}
+.obs-hub .obs-rhead h2{font-size:26px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.obs-hub .obs-rhead p{margin-top:6px;color:var(--muted);line-height:1.55}
+.obs-rsec{padding-top:20px}
+.obs-hub .obs-rsec > h3{margin:0 0 8px;font-size:15px;line-height:1.3;color:var(--muted);font-weight:600}
+.obs-rlist .obs-step{grid-template-columns:minmax(0,1fr);padding-left:14px}
+.obs-rlist .obs-step::before{display:none}
+.obs-answers{display:grid;gap:12px}
+.obs-answers .obs-answer,.obs-results .obs-answer{margin:0;max-width:760px}
+
+@media (max-width:720px){
+  .obs-photo{left:0;right:0;top:0;height:310px;border-radius:0}
+  .obs-hero{padding-top:44px;padding-bottom:12px}
+  .obs-hub .obs-hero-sub{font-size:16px;margin-top:12px}
+  .obs-hub .obs-form{height:56px;padding-left:14px;padding-right:6px;border-radius:16px}
+  .obs-hub .obs-form input{font-size:16px}
+  .obs-go{display:none}
+  .obs-popular{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;margin-left:calc(-1 * max(16px,env(safe-area-inset-left,0px)));margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding:2px max(16px,env(safe-area-inset-right,0px)) 2px max(16px,env(safe-area-inset-left,0px))}
+  .obs-popular::-webkit-scrollbar{display:none}
+  .obs-popular .obs-chip,.obs-popular .lbl{flex:0 0 auto}
+  .obs-byline{font-size:13.5px;margin-top:44px}
+  .obs-band{margin-top:30px}
+  .obs-topics{padding-top:30px;padding-bottom:32px}
+  .obs-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .obs-tsec{grid-template-columns:minmax(0,1fr);gap:10px;padding-top:32px;padding-bottom:32px}
+  .obs-thead{position:static}
+  .obs-step{padding:12px 6px 12px 2px;gap:12px}
+  .obs-step:not(:last-child)::before{left:20px}
+  .obs-searchwrap.is-sheet{z-index:2147483000}
+  .obs-searchwrap.is-sheet .obs-shell{position:fixed;inset:0;z-index:2147483000;max-width:none;display:flex;flex-direction:column;background:var(--paper);padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .obs-searchwrap.is-sheet .obs-search{flex:1;min-height:0;display:flex;flex-direction:column}
+  .obs-searchwrap.is-sheet .obs-form{height:52px;box-shadow:none}
+  .obs-searchwrap.is-sheet .obs-cancel{display:inline-flex;align-items:center}
+  .obs-searchwrap.is-sheet .obs-chips{display:none}
+  .obs-searchwrap.is-sheet .obs-panel{position:static;flex:1;max-height:none;margin-top:10px;padding:16px 0 24px;border:0;border-radius:0;box-shadow:none}
+}
+@media (prefers-reduced-motion:reduce){.obs-hub *{transition:none!important}}
+</style>
+<div class="obs-hub" id="obs-hub">
+  <div class="obs-photo" id="obs-photo" aria-hidden="true"><img src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog.webp" srcset="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog-p-500.webp 500w, https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog-p-800.webp 800w, https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog-p-1080.webp 1080w, https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog-p-1600.webp 1600w, https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog-p-2000.webp 2000w, https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/677d851dddd0fca7b91e255b_hauptbild_blog.webp 2240w" sizes="(max-width: 720px) 100vw, (max-width: 1120px) calc(100vw - 32px), 1088px" alt="" fetchpriority="high"></div>
+  <section class="obs-hero obs-wrap">
+    <h1 class="obs-h1"><span class="obs-mark">Wissensblog</span></h1>
+    <p class="obs-hero-sub">Dein Blog für mehr Erfolg in Mathe</p>
+  </section>
+
+  <div class="obs-sentinel" id="obs-sentinel" aria-hidden="true"></div>
+  <div class="obs-searchwrap obs-js" id="obs-searchwrap">
+    <div class="obs-shell">
+      <div class="obs-search" id="obs-search">
+        <div class="obs-row">
+          <form class="obs-form" id="obs-form" role="search" action="/blog" method="get">
+            <svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <label class="obs-sr" for="obs-q">Im Wissensblog suchen</label>
+            <input id="obs-q" name="q" type="search" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="Thema, Rechner oder Frage" role="combobox" aria-expanded="false" aria-controls="obs-panel" aria-autocomplete="list">
+            <button type="button" class="obs-clear" id="obs-clear" aria-label="Eingabe löschen" hidden><svg class="obs-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+            <button type="submit" class="obs-go">Suchen</button>
+          </form>
+          <button type="button" class="obs-cancel" id="obs-cancel">Abbrechen</button>
+        </div>
+        <div class="obs-panel" id="obs-panel" role="listbox" aria-label="Vorschläge" hidden></div>
+      </div>
+      <nav class="obs-chips" id="obs-chips" aria-label="Themen"></nav>
+    </div>
+  </div>
+
+  <div class="obs-after obs-wrap obs-js">
+    <div class="obs-popular" id="obs-popular"><span class="lbl">Oft gesucht:</span></div>
+    <div class="obs-byline"><span class="obs-avs lg" aria-hidden="true"><i class="obs-av obs-av-lisa"></i><i class="obs-av obs-av-gregor"></i></span><span id="obs-byline-text"></span></div>
+  </div>
+
+  <div class="obs-band obs-js">
+    <section class="obs-topics obs-wrap" aria-labelledby="obs-topics-h">
+      <h2 class="obs-h2" id="obs-topics-h">Wähle dein Thema</h2>
+      <div class="obs-tiles" id="obs-tiles"></div>
+    </section>
+  </div>
+
+  <div class="obs-content obs-wrap obs-js" id="obs-content" tabindex="-1"></div>
+  <div class="obs-sr" id="obs-status" role="status" aria-live="polite"></div>
+</div>
