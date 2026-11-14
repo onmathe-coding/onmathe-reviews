@@ -1,0 +1,150 @@
+<!-- OnMathe Tutor-Slider (Startseite, Sektion Experten). Stand 14.11.2026.
+     Kartentexte und Bildausschnitte 1:1 wie die Tutor-Karten auf /mathematik.
+     Endlosschleife, fährt alle 4,5 s eine Karte weiter, pausiert bei Hover, Fokus oder
+     Tab im Hintergrund, stoppt nach Pfeil-Klick oder Wischen.
+     Tempo im Script oben: DUR (Fahrzeit), DWELL (Standzeit). -->
+<div class="omtc" lang="de" data-omtc role="region" aria-roledescription="Karussell" aria-label="Unsere Tutoren">
+<svg class="omtc-sym" aria-hidden="true" focusable="false"><symbol id="omtc-cap" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol><symbol id="omtc-ck" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol></svg>
+<div class="omtc-vp"><div class="omtc-track" aria-live="off">
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="1 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-z" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6730e2686a1d283e6db069f6_home_gregor-p-500.webp" alt="Tutor Gregor" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Gregor, Dipl.‑Math.</p><p class="omtc-role">Diplom-Mathematiker &amp; Gründer</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Diplom mit Auszeichnung, Uni Ulm</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill">Physik</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="2 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-t" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6a302550d5b15322777f2144_beate26-p-500.png" alt="Tutorin Beate" width="500" height="375" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Beate, Dipl.‑Phys.</p><p class="omtc-role">Diplom-Physikerin</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Über 25 Jahre Erfahrung als Tutorin</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill">Physik</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="3 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-z" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6730e2c4670a95670f30f47a_home_lisa-p-500.webp" alt="Tutorin Lisa" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Lisa</p><p class="omtc-role">Spezialistin für Oberstufe &amp; Abitur</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Rund 30 Abiturienten pro Woche</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="4 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-f" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6a05776264877d3827cfbf53_vivian-p-500.webp" alt="Tutorin Vivien" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Vivien</p><p class="omtc-role">Medizinstudentin &amp; Mathe-Tutorin</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Sehr gutes Abitur in Mathe und Bio</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="5 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-z" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6772c19fc1b38a732bdaefb0_home_bastian-p-500.webp" alt="Tutor Bastian" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Bastian</p><p class="omtc-role">Lehramt Mathematik &amp; Physik</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Mathe-Abitur: volle 15 Punkte</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill">Physik</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="6 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-z" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6730e26c91a5402c422f065c_home_leonie-p-500.webp" alt="Tutorin Leonie" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Leonie</p><p class="omtc-role">Spezialistin für die Unterstufe</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Mathe-Abitur mit „sehr gut“</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="7 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-z" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6762a370b0acb3cabec17375_home_kristina-p-500.webp" alt="Tutorin Kristina" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Kristina</p><p class="omtc-role">Hauptberufliche Mathe-Tutorin</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Studium der Mathematischen Biometrie</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="8 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-t" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6a3a9f165d3a3d378c2f2cd9_Lennart-p-500.webp" alt="Tutor Lennart" width="500" height="500" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Lennart, B.Sc.</p><p class="omtc-role">Studierter Mathematiker (B.Sc.)</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>Bachelor in Mathematik</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+<article class="omtc-card" role="group" aria-roledescription="Folie" aria-label="9 von 9"><div class="omtc-head"><div class="omtc-ava"><img class="omtc-img omtc-t" src="https://cdn.prod.website-files.com/65f5a102f6a2ab9750c03dfb/6a2ec8d1a77c1ee08c978ea9_laurin-p-500.png" alt="Tutor Laurin" width="500" height="375" loading="lazy" decoding="async" draggable="false"></div><div class="omtc-id"><p class="omtc-name">Laurin, B.Eng.</p><p class="omtc-role">Ingenieur­mathematik: Note 1,0</p></div></div><p class="omtc-fact"><svg aria-hidden="true"><use href="#omtc-ck"/></svg><span>B.Eng. Fahrzeugtechnik, TH Köln</span></p><div class="omtc-tags"><span class="omtc-pill">Mathe</span><span class="omtc-pill omtc-hb"><svg aria-hidden="true"><use href="#omtc-cap"/></svg>Hauptberuflich</span></div></article>
+</div></div>
+<div class="omtc-nav"><button type="button" class="omtc-btn omtc-prev" aria-label="Vorheriger Tutor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><a class="omtc-all" href="/mathematik">Alle 9 Tutoren kennenlernen</a><button type="button" class="omtc-btn omtc-next" aria-label="Nächster Tutor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg></button><button type="button" class="omtc-tog" aria-label="Automatisches Weiterblättern anhalten"><svg class="omtc-i-pause" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 6v12M15 6v12"/></svg><svg class="omtc-i-play" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></button></div>
+</div>
+<style>
+.omtc{--omtc-card:304px;--omtc-gap:20px;--omtc-fade:72px;--omtc-vw:calc(100vw - var(--omtc-sb,0px));--omtc-w:min(1120px,calc(var(--omtc-vw) - 48px));position:relative;width:var(--omtc-w);margin:0 0 2.5rem calc((100% - var(--omtc-w)) / 2);font-family:"Inter 28 Pt",Inter,Arial,sans-serif;color:#1c2638;-webkit-font-smoothing:antialiased}
+.omtc *,.omtc *::before,.omtc *::after{box-sizing:border-box}
+.omtc p{margin:0}
+.omtc-sym{position:absolute;width:0;height:0;overflow:hidden}
+.omtc-vp{overflow:hidden;padding:12px 0 44px;margin-bottom:-24px;touch-action:pan-y;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--omtc-fade),#000 calc(100% - var(--omtc-fade)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--omtc-fade),#000 calc(100% - var(--omtc-fade)),transparent 100%)}
+.omtc-track{display:flex;gap:var(--omtc-gap);will-change:transform;-webkit-user-select:none;user-select:none}
+.omtc-card{flex:0 0 var(--omtc-card);min-width:0;display:flex;flex-direction:column;gap:14px;margin:0;padding:20px;border:1px solid #e6e9ef;border-radius:24px;background:linear-gradient(165deg,#fff 55%,#fff4e6 100%);box-shadow:0 20px 50px -30px rgba(28,38,56,.35)}
+.omtc-head{display:flex;align-items:center;gap:16px}
+.omtc-ava{position:relative;flex:0 0 96px;width:96px;height:96px;overflow:hidden;border:3px solid #fff;border-radius:50%;background:#f4f6f9;box-shadow:0 0 0 2px #ffd9b0,0 8px 20px rgba(28,38,56,.14);isolation:isolate}
+.omtc-img{position:absolute;left:0;top:0;display:block;width:100%;height:100%;max-width:none;object-fit:cover;-webkit-user-drag:none}
+.omtc-z{left:-6%;top:-6%;width:112%;height:112%}
+.omtc-t{object-position:50% 25%}
+.omtc-f{left:-4%;top:-4%;width:108%;height:108%;object-position:45% 18%}
+.omtc-id{display:flex;flex-direction:column;gap:3px;min-width:0;overflow-wrap:break-word}
+.omtc-name{font-size:17px;font-weight:700;line-height:1.2;letter-spacing:-.3px;color:#1c2638}
+.omtc-role{font-size:13px;font-weight:500;line-height:1.35;color:#6b7486}
+.omtc-fact{display:flex;gap:8px;overflow-wrap:break-word;font-size:14px;line-height:1.45;color:#3d4656}
+.omtc-fact svg{flex:0 0 16px;width:16px;height:16px;margin-top:2px;fill:none;stroke:#25853a;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.omtc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.omtc-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:999px;background:#f4f6f9;font-size:12px;font-weight:700;line-height:1.2;color:#1c2638}
+.omtc-hb{padding-left:9px;background:#eef1f5;color:#334155}
+.omtc-hb svg{width:14px;height:14px;fill:none;stroke:#ff8a00;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
+.omtc-nav{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px}
+.omtc-btn,.omtc-tog{-webkit-appearance:none;appearance:none;display:inline-flex;align-items:center;justify-content:center;margin:0;padding:0;border:1px solid #e6e9ef;border-radius:50%;font:inherit;cursor:pointer;transition:border-color .2s,box-shadow .2s,transform .15s}
+.omtc-btn{width:48px;height:48px;background:#fff;color:#ff8a00;box-shadow:0 10px 24px -14px rgba(28,38,56,.45)}
+.omtc-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.omtc-btn:hover{border-color:#ffd9b0;box-shadow:0 12px 26px -12px rgba(255,138,0,.5)}
+.omtc-tog{width:40px;height:40px;margin-left:4px;background:#f7f8fa;color:#5b6578}
+.omtc-tog:hover{border-color:#d5dae2}
+.omtc-tog svg{width:16px;height:16px}
+.omtc-btn:active,.omtc-tog:active{transform:scale(.95)}
+.omtc-i-play,.omtc.is-paused .omtc-i-pause{display:none}
+.omtc.is-paused .omtc-i-play{display:block}
+.omtc-all{padding:10px 8px;border-radius:6px;font-size:14px;font-weight:600;line-height:1.2;color:#b85c00;text-decoration:none}
+.omtc-all:hover{color:#8a4500;text-decoration:underline;text-underline-offset:3px}
+.omtc-btn:focus-visible,.omtc-tog:focus-visible,.omtc-all:focus-visible{outline:2px solid #ff8a00;outline-offset:3px}
+@media (hover:hover){.omtc-vp{cursor:grab}.omtc.is-drag .omtc-vp{cursor:grabbing}}
+@media (max-width:767px){.omtc{--omtc-card:min(304px,calc(100vw - 84px));--omtc-gap:14px;--omtc-fade:18px;--omtc-w:var(--omtc-vw);margin-bottom:1.75rem}.omtc-card{gap:12px;padding:18px;border-radius:22px}.omtc-head{gap:12px}.omtc-ava{flex-basis:84px;width:84px;height:84px}.omtc-name{font-size:16px}.omtc-btn{width:44px;height:44px}.omtc-nav{gap:8px}}
+@media (max-width:479px){.omtc-all{order:5;flex-basis:100%;padding-top:6px;text-align:center}}
+@media (max-width:374px){.omtc-ava{flex-basis:72px;width:72px;height:72px}}
+@media (prefers-reduced-motion:reduce){.omtc-btn,.omtc-tog{transition:none}}
+</style>
+<script data-cookieconsent="ignore">
+(function(){
+'use strict';
+/* Tempo: DUR = Fahrzeit pro Karte, DWELL = Standzeit, SNAP = Einrasten nach Wischen (ms) */
+var DUR=700,DWELL=4500,SNAP=420,K=5,EASE='cubic-bezier(.45,0,.2,1)',EASE_SNAP='cubic-bezier(.2,.7,.2,1)';
+var mq=window.matchMedia?window.matchMedia('(prefers-reduced-motion: reduce)'):null;
+function init(root){
+root.setAttribute('data-omtc-ready','');
+var vp=root.querySelector('.omtc-vp'),track=root.querySelector('.omtc-track'),prev=root.querySelector('.omtc-prev'),next=root.querySelector('.omtc-next'),tog=root.querySelector('.omtc-tog');
+var slides=[].slice.call(track.children),n=slides.length;
+if(n<2)return;
+var reduce=!!(mq&&mq.matches);
+function clone(el){var c=el.cloneNode(true);['role','aria-roledescription','aria-label'].forEach(function(a){c.removeAttribute(a);});c.setAttribute('aria-hidden','true');c.setAttribute('inert','');[].forEach.call(c.querySelectorAll('img'),function(im){im.alt='';});return c;}
+for(var i=0;i<K;i++){track.appendChild(clone(slides[i%n]));track.insertBefore(clone(slides[((n-1-i)%n+n)%n]),track.firstChild);}
+var pos=0,x=0,step=1,align=0,h=1,playing=!reduce,inView=false,hovered=false,focused=false,dragging=false,moving=false,timer=0,settleT=0;
+function measure(){root.style.setProperty('--omtc-sb',Math.max(0,window.innerWidth-document.documentElement.clientWidth)+'px');var a=track.children[K].getBoundingClientRect(),b=track.children[K+1].getBoundingClientRect();step=(b.left-a.left)||1;align=(vp.clientWidth-a.width)/2;h=Math.ceil(align/step)+1;}
+function xAt(p){return align-(K+p)*step;}
+function paint(px,ms,ease){x=px;track.style.transition=ms?'transform '+ms+'ms '+ease:'none';track.style.transform='translate3d('+px+'px,0,0)';}
+function lim(){return Math.max(0,K-h);}
+function go(p,ms,ease){var l=lim();if(p<-l||p>n-1+l)return;pos=p;clearTimeout(timer);clearTimeout(settleT);if(reduce)ms=0;paint(Math.round(xAt(p)),ms,ease||EASE);moving=ms>0;if(moving)settleT=setTimeout(settle,ms+80);else settle();}
+function settle(){clearTimeout(settleT);moving=false;if(pos<0||pos>=n){pos=(pos%n+n)%n;paint(Math.round(xAt(pos)),0);void track.offsetWidth;}schedule();}
+track.addEventListener('transitionend',function(e){if(e.target===track&&moving)settle();});
+function ok(){return playing&&inView&&!hovered&&!focused&&!dragging&&!document.hidden;}
+function schedule(){clearTimeout(timer);if(ok()&&!moving)timer=setTimeout(function(){if(ok())go(pos+1,DUR);},DWELL);}
+function setPlaying(v){playing=v;root.classList.toggle('is-paused',!v);tog.setAttribute('aria-label',v?'Automatisches Weiterblättern anhalten':'Automatisches Weiterblättern starten');track.setAttribute('aria-live',v?'off':'polite');if(v)schedule();else clearTimeout(timer);}
+prev.addEventListener('click',function(){setPlaying(false);go(pos-1,DUR);});
+next.addEventListener('click',function(){setPlaying(false);go(pos+1,DUR);});
+tog.addEventListener('click',function(){setPlaying(!playing);});
+vp.addEventListener('pointerenter',function(e){if(e.pointerType==='mouse'){hovered=true;clearTimeout(timer);}});
+vp.addEventListener('pointerleave',function(e){if(e.pointerType==='mouse'){hovered=false;schedule();}});
+root.addEventListener('focusin',function(e){if(e.target!==tog){focused=true;clearTimeout(timer);}});
+root.addEventListener('focusout',function(e){var r=e.relatedTarget;if(!r||!root.contains(r)||r===tog){focused=false;schedule();}});
+/* Wischen und Ziehen */
+var down=false,decided=false,pid=null,sx=0,sy=0,baseX=0,startPos=0,lx=0,lt=0,vx=0;
+function currentX(){var t=getComputedStyle(track).transform;if(!t||t==='none')return x;try{return new DOMMatrixReadOnly(t).m41;}catch(err){var m=t.match(/-?[\d.e]+/g);return m?+(m.length>6?m[12]:m[4]):x;}}
+vp.addEventListener('pointerdown',function(e){if(e.pointerType==='mouse'&&e.button!==0)return;down=true;decided=false;pid=e.pointerId;sx=lx=e.clientX;sy=e.clientY;lt=e.timeStamp;vx=0;});
+vp.addEventListener('pointermove',function(e){
+if(!down||e.pointerId!==pid)return;
+var dx=e.clientX-sx,dy=e.clientY-sy;
+if(!decided){
+if(Math.abs(dx)<7&&Math.abs(dy)<7)return;
+if(Math.abs(dy)>=Math.abs(dx)){down=false;return;}
+decided=true;dragging=true;setPlaying(false);
+try{vp.setPointerCapture(pid);}catch(err){}
+baseX=currentX();clearTimeout(settleT);moving=false;paint(baseX,0);
+sx=e.clientX;startPos=(align-baseX)/step-K;root.classList.add('is-drag');
+}
+var l=lim(),lo=xAt(n-1+l),hi=xAt(-l);
+paint(Math.min(hi,Math.max(lo,baseX+e.clientX-sx)),0);
+var dt=e.timeStamp-lt;if(dt>0)vx=0.7*((e.clientX-lx)/dt)+0.3*vx;lx=e.clientX;lt=e.timeStamp;
+});
+function release(e){
+if(!down||e.pointerId!==pid)return;
+down=false;if(!decided)return;
+dragging=false;root.classList.remove('is-drag');
+if(e.timeStamp-lt>90)vx=0;
+var cur=(align-x)/step-K,moved=cur-startPos,base=Math.round(startPos),fast=Math.abs(vx)>0.35,dir=moved>=0?1:-1,t=base;
+if(fast){var dv=vx<0?1:-1;if(dv===dir||Math.abs(moved)<0.18)dir=dv;else dir=0;}
+else if(Math.abs(moved)<=0.18)dir=0;
+if(dir>0)t=Math.max(base+1,Math.round(cur));else if(dir<0)t=Math.min(base-1,Math.round(cur));
+var l=lim();t=Math.max(-l,Math.min(n-1+l,t));
+go(t,SNAP,EASE_SNAP);
+}
+vp.addEventListener('pointerup',release);
+vp.addEventListener('pointercancel',release);
+vp.addEventListener('lostpointercapture',release);
+vp.addEventListener('dragstart',function(e){e.preventDefault();});
+/* Fotos laden, kurz bevor der Slider ins Bild kommt; Automatik nur, solange er sichtbar ist */
+function eager(){[].forEach.call(track.querySelectorAll('img'),function(im){im.loading='eager';});}
+if('IntersectionObserver' in window){
+new IntersectionObserver(function(en){var e=en[en.length-1];inView=e.isIntersecting&&e.intersectionRatio>=0.3;if(inView)schedule();else clearTimeout(timer);},{threshold:[0,0.3,0.6,1]}).observe(vp);
+var io=new IntersectionObserver(function(en){if(en[en.length-1].isIntersecting){eager();io.disconnect();}},{rootMargin:'900px 0px'});io.observe(root);
+}else{inView=true;eager();}
+document.addEventListener('visibilitychange',function(){if(document.hidden)clearTimeout(timer);else schedule();});
+var lastW=-1;
+function relayout(){measure();clearTimeout(settleT);moving=false;pos=(pos%n+n)%n;paint(Math.round(xAt(pos)),0);schedule();}
+if('ResizeObserver' in window)new ResizeObserver(function(){var w=root.clientWidth;if(w!==lastW){lastW=w;relayout();}}).observe(root);
+else window.addEventListener('resize',relayout);
+measure();
+pos=Math.max(0,Math.min(n-1,Math.floor((align+2)/step)));
+paint(Math.round(xAt(pos)),0);
+lastW=root.clientWidth;
+setPlaying(playing);
+}
+[].forEach.call(document.querySelectorAll('[data-omtc]:not([data-omtc-ready])'),init);
+})();
+</script>
