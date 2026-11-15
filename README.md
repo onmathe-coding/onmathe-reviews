@@ -38,3 +38,7 @@ Actions → Reviews aktualisieren → Run workflow
 ## Blog-Hub
 
 `blog-hub/` enthält die drei Webflow-Embeds der Blog-Übersicht [/blog](https://www.onmathe.de/blog) (Suche, Themen, Lernpfade). Aufbau und Pflege siehe `blog-hub/README.md`. Die Action oben betrifft diesen Ordner nicht.
+
+## Notenrechner
+
+`magazin-notenrechner/` enthält die Quellen des Rechners im Magazinbeitrag [/magazin/notenrechner](https://www.onmathe.de/magazin/notenrechner). Die fertige Datei `public/notenrechner/notenrechner.js` liegt neben den Bewertungen auf GitHub Pages, Änderungen daran lösen die Action aus. Details siehe `magazin-notenrechner/README.md`.

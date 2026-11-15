@@ -2,16 +2,19 @@
 
 Rechner im Magazinbeitrag „Notenrechner: Notendurchschnitt berechnen und Versetzung prüfen“. Läuft komplett im Browser, speichert nichts. Stand 15.11.2026.
 
-## Aufbau im CMS (Articlepages, Feld „Inhalt“)
+## Aufbau
 
-Vier Code-Blöcke im Rich Text, direkt nach dem ersten Absatz, in dieser Reihenfolge:
+- **Im CMS** (Articlepages, Feld „Inhalt“) steht nur ein kleiner Code-Block: die Section `#mnr` mit H2 und Einleitung, der leere Platzhalter `#mnr-app` und das Script `notenrechner.js` (`defer`, `data-cookieconsent="ignore"`).
+- **`public/notenrechner/notenrechner.js`** wird über GitHub Pages ausgeliefert: https://onmathe-coding.github.io/onmathe-reviews/notenrechner/notenrechner.js. Es baut Stil und Oberfläche in `#mnr-app` ein und startet die Logik.
+- Eine Änderung an `public/notenrechner/` löst die Action „Reviews aktualisieren“ aus und veröffentlicht die Datei sofort. Nach einer Änderung im CMS die Version im Script-Link hochzählen (`?v=2`), damit Browser nicht die alte Datei aus dem Cache nehmen.
 
-1. `nr.css` als `<style>`: Stil, alle Klassen mit Präfix `mnr-`, Farben aus den `mag-`-Variablen der Artikelvorlage.
-2. `nr.html`: Grundgerüst mit vier Tabs (Fachnote, Zeugnis und Versetzung, Zielnote, Punkte in Note).
-3. `nr1.js` als `<script>`: Notenlesen, Tabs, Fachnote, Zielnote, Punkte.
-4. `nr2.js` als `<script>`: Fächerliste und Versetzungsprüfung.
+## Quellen in diesem Ordner
 
-Jeder Block bleibt unter 10.000 Zeichen (Grenze für Code im Rich Text). Im CMS stehen die Skripte ohne Einrückung und Zeilenkommentare, hier lesbar.
+- `nr.css`: Stil, alle Klassen mit Präfix `mnr-`, Farben aus den `mag-`-Variablen der Artikelvorlage.
+- `nr.html`: Oberfläche mit vier Tabs (Fachnote, Zeugnis und Versetzung, Zielnote, Punkte in Note). Der Kopf bis zur Einleitung steht im CMS, der Rest wird eingebaut.
+- `nr1.js`: Notenlesen, Tabs, Fachnote, Zielnote, Punkte.
+- `nr2.js`: Fächerliste und Versetzungsprüfung.
+- `build_bundle.py`: baut aus den vier Dateien `notenrechner.js` und den statischen CMS-Teil.
 
 ## Regeln
 

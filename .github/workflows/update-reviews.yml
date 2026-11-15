@@ -2,6 +2,7 @@
 # (Auswahl fuers Widget) und public/reviews_alle.json (alle, fuer den Abgleich
 # in der Kundenerfassung), seit 07.11.2026 auch public/reviews_augustin_alle.json
 # (Augustin Heidenheim, nur fuer den Abgleich) und veroeffentlicht public/ ueber GitHub Pages.
+# Seit 15.11.2026 liegt dort auch public/notenrechner/notenrechner.js (Magazin), Aenderungen daran loesen den Lauf ebenfalls aus.
 # Schlaegt der Google-Abruf fehl, bleibt die bisherige reviews.json online,
 # der Lauf wird aber rot markiert (GitHub schickt dann eine Mail).
 name: Reviews aktualisieren
@@ -14,6 +15,7 @@ on:
     branches: [main]
     paths:
       - 'scripts/**'
+      - 'public/notenrechner/**'
       - '.github/workflows/update-reviews.yml'
 
 permissions:
