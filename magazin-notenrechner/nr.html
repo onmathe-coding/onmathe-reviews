@@ -1,87 +1,21 @@
 <section class="mag-wide mag-calcband mnr" id="mnr" aria-labelledby="notenrechner">
 <div class="mag-ct">
-<h2 id="notenrechner">Notenrechner: Schnitt, Versetzung und Zielnote</h2>
-<p>Wähle aus, was du berechnen willst. Alles wird nur in deinem Browser gerechnet, nichts wird gespeichert oder übertragen.</p>
+<h2 id="notenrechner">Notenrechner: Fachnote berechnen</h2>
+<p>Wähle die Noten deiner Klassenarbeiten und deine mündliche Note aus und tippe auf Berechnen. Alles wird nur in deinem Browser gerechnet, nichts wird gespeichert.</p>
 </div>
-<div class="mnr-tabs" role="tablist" aria-label="Was willst du berechnen?">
-<button type="button" class="mnr-tab" role="tab" id="mnr-t-fachnote" aria-controls="mnr-p-fachnote" aria-selected="true">Fachnote</button>
-<button type="button" class="mnr-tab" role="tab" id="mnr-t-zeugnis" aria-controls="mnr-p-zeugnis" aria-selected="false" tabindex="-1">Zeugnis und Versetzung</button>
-<button type="button" class="mnr-tab" role="tab" id="mnr-t-zielnote" aria-controls="mnr-p-zielnote" aria-selected="false" tabindex="-1">Zielnote</button>
-<button type="button" class="mnr-tab" role="tab" id="mnr-t-punkte" aria-controls="mnr-p-punkte" aria-selected="false" tabindex="-1">Punkte in Note</button>
+<div class="mag-calc mnr-calc">
+<div class="mnr-in">
+<div class="mnr-step" role="group" aria-labelledby="mnr-l1">
+<p class="mnr-lab" id="mnr-l1"><span class="mnr-nr" aria-hidden="true">1</span>Noten deiner Klassenarbeiten</p>
+<div class="mnr-noten" id="mnr-arb"></div>
+<button type="button" class="mnr-add" id="mnr-add">+ Weitere Arbeit</button>
 </div>
-
-<div class="mnr-panel" role="tabpanel" id="mnr-p-fachnote" aria-labelledby="mnr-t-fachnote">
-<div class="mag-calc">
-<div class="mag-fields">
-<label class="mag-fld mnr-wide">Noten in Klassenarbeiten<input id="mnr-f-s" type="text" autocomplete="off" spellcheck="false" value="3 2- 4" placeholder="z. B. 3 2- 4 3+"></label>
-<div class="mnr-chips mnr-wide" id="mnr-f-sc" aria-hidden="true"></div>
-<label class="mag-fld mnr-wide">Mündliche und sonstige Noten<input id="mnr-f-m" type="text" autocomplete="off" spellcheck="false" value="3+" placeholder="z. B. 3+ 2"></label>
-<div class="mnr-chips mnr-wide" id="mnr-f-mc" aria-hidden="true"></div>
-<label class="mag-fld">Gewicht der Arbeiten<select id="mnr-f-w"><option value="50">50 %, gleich viel</option><option value="60">60 %</option><option value="66.6667">67 %, doppelt so viel</option><option value="70">70 %</option><option value="75">75 %</option></select></label>
-<label class="mag-fld">Plus und Minus zählen<select class="mnr-tsel"><option value="0.25">0,25 (2- = 2,25)</option><option value="0.3" selected>0,3 (2- = 2,3)</option><option value="0.3333">0,33 (2- = 2,33)</option></select></label>
+<div class="mnr-step">
+<label class="mnr-lab" for="mnr-m"><span class="mnr-nr" aria-hidden="true">2</span>Deine mündliche Note</label>
+<div class="mnr-noten"><span class="mnr-sel"><select id="mnr-m"></select></span></div>
 </div>
-<div class="mag-outs" aria-live="polite">
-<div class="mag-out main"><span class="mag-out-k">Fachnote rechnerisch</span><span class="mag-out-v" id="mnr-f-o">-</span></div>
-<div class="mag-out"><span class="mag-out-k">Schnitt der Arbeiten</span><span class="mag-out-v" id="mnr-f-oa">-</span></div>
-<div class="mag-out"><span class="mag-out-k">Schnitt mündlich</span><span class="mag-out-v" id="mnr-f-ob">-</span></div>
-<p class="mnr-say mnr-wide" id="mnr-f-v"></p>
+<button type="button" class="mnr-go" id="mnr-go">Berechnen</button>
 </div>
-</div>
-<p class="mag-calc-hint">Noten trennst du mit Leerzeichen. Erlaubt sind ganze Noten, Plus und Minus (2-), Zwischennoten (2-3) und Dezimalzahlen (2,5).</p>
-</div>
-
-<div class="mnr-panel" role="tabpanel" id="mnr-p-zeugnis" aria-labelledby="mnr-t-zeugnis" hidden>
-<div class="mag-calc" id="mnr-zbox">
-<div>
-<label class="mag-fld">Deine Schule<select id="mnr-z-rule"><option value="fr">Alle Bundesländer (Faustregel)</option><option value="bw">Gymnasium in Baden-Württemberg (genau)</option></select></label>
-<div class="mnr-zhead" aria-hidden="true"><span>Fach</span><span>Note</span><span><span class="mnr-dk">Kernfach</span><span class="mnr-mb">Kern</span></span><span></span></div>
-<div id="mnr-z-rows"></div>
-<div class="mnr-zbtns"><button type="button" class="mnr-lbtn" id="mnr-z-add">Fach hinzufügen</button><button type="button" class="mnr-lbtn" id="mnr-z-clr">Noten leeren</button></div>
-<p class="mnr-hint">Mit Beispielnoten vorausgefüllt. Steht eine Note noch zwischen zwei Stufen, wähle zum Beispiel 4-5: Der Rechner prüft dann beide Fälle.</p>
-</div>
-<div class="mag-outs" aria-live="polite">
-<div class="mnr-st" id="mnr-z-st" data-s="none"><span class="mnr-st-k">Versetzung</span><span class="mnr-st-t" id="mnr-z-t">-</span><p id="mnr-z-d"></p></div>
-<div class="mag-out mnr-abox"><span class="mag-out-k">Schnitt aller Fächer</span><span class="mag-out-v" id="mnr-z-a">-</span></div>
-<div class="mag-out mnr-kbox"><span class="mag-out-k">Schnitt der Kernfächer</span><span class="mag-out-v" id="mnr-z-k">-</span></div>
-<ul class="mnr-why" id="mnr-z-w"></ul>
-<button type="button" class="mnr-go" data-go="zielnote">Welche Note brauche ich noch?</button>
-</div>
-</div>
-</div>
-
-<div class="mnr-panel" role="tabpanel" id="mnr-p-zielnote" aria-labelledby="mnr-t-zielnote" hidden>
-<div class="mag-calc">
-<div class="mag-fields">
-<label class="mag-fld mnr-wide">Bisherige Noten in Arbeiten<input id="mnr-g-s" type="text" autocomplete="off" spellcheck="false" value="5 4- 5" placeholder="z. B. 5 4-"></label>
-<div class="mnr-chips mnr-wide" id="mnr-g-sc" aria-hidden="true"></div>
-<label class="mag-fld">Mündliche Note<input id="mnr-g-m" type="text" autocomplete="off" spellcheck="false" value="5+" placeholder="z. B. 4"></label>
-<label class="mag-fld">Arbeiten bis zum Zeugnis<select id="mnr-g-k"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
-<label class="mag-fld">Ziel auf dem Zeugnis<select id="mnr-g-z"><option value="1">eine 1</option><option value="2">eine 2</option><option value="3">eine 3</option><option value="4" selected>eine 4</option></select></label>
-<label class="mag-fld">Gewicht der Arbeiten<select id="mnr-g-w"><option value="50">50 %, gleich viel</option><option value="60">60 %</option><option value="66.6667">67 %, doppelt so viel</option><option value="70">70 %</option><option value="75">75 %</option></select></label>
-<label class="mag-fld mnr-wide">Plus und Minus zählen<select class="mnr-tsel"><option value="0.25">0,25 (2- = 2,25)</option><option value="0.3" selected>0,3 (2- = 2,3)</option><option value="0.3333">0,33 (2- = 2,33)</option></select></label>
-</div>
-<div class="mag-outs" aria-live="polite">
-<div class="mag-out main"><span class="mag-out-k" id="mnr-g-ok">Nötig in der nächsten Arbeit</span><span class="mag-out-v" id="mnr-g-o">-</span><span class="mnr-sub" id="mnr-g-ol"></span></div>
-<div class="mag-out mnr-wide"><span class="mag-out-k">Fachnote bisher</span><span class="mag-out-v" id="mnr-g-now">-</span></div>
-<p class="mnr-say mnr-wide" id="mnr-g-v"></p>
-</div>
-</div>
-<p class="mag-calc-hint">Ziel heißt: rechnerisch unter x,5, also zum Beispiel unter 4,5 für eine 4. Die Zeugnisnote legt am Ende die Lehrkraft in einer Gesamtwertung fest.</p>
-</div>
-
-<div class="mnr-panel" role="tabpanel" id="mnr-p-punkte" aria-labelledby="mnr-t-punkte" hidden>
-<div class="mag-calc">
-<div class="mag-fields">
-<label class="mag-fld">Erreichte Punkte<input id="mnr-p-a" type="number" inputmode="decimal" min="0" step="0.5" value="34"></label>
-<label class="mag-fld">Mögliche Punkte<input id="mnr-p-b" type="number" inputmode="decimal" min="1" step="0.5" value="50"></label>
-<label class="mag-fld mnr-wide">Notenschlüssel<select id="mnr-p-s"><option value="ihk">IHK-Schlüssel (Noten 1 bis 6)</option><option value="kmk">Oberstufe und Abitur (15 bis 0 Punkte)</option></select></label>
-</div>
-<div class="mag-outs" aria-live="polite">
-<div class="mag-out main"><span class="mag-out-k">Ergebnis</span><span class="mag-out-v" id="mnr-p-o">-</span><span class="mnr-sub" id="mnr-p-ol"></span></div>
-<div class="mag-out"><span class="mag-out-k">Anteil</span><span class="mag-out-v" id="mnr-p-pc">-</span></div>
-<div class="mag-out"><span class="mag-out-k">Nächste Stufe</span><span class="mag-out-v" id="mnr-p-nx">-</span></div>
-</div>
-</div>
-<p class="mag-calc-hint">Deine Lehrkraft kann einen eigenen Schlüssel verwenden. Maßgeblich ist der Schlüssel unter deiner Arbeit.</p>
+<div class="mnr-out" id="mnr-out" aria-live="polite"><p class="mnr-leer">Hier siehst du gleich deine Fachnote.</p></div>
 </div>
 </section>

@@ -41,7 +41,7 @@ Actions → Reviews aktualisieren → Run workflow
 
 ## Notenrechner
 
-`magazin-notenrechner/` enthält die Quellen des Rechners im Magazinbeitrag [/magazin/notenrechner](https://www.onmathe.de/magazin/notenrechner). Die fertige Datei `public/notenrechner/notenrechner.js` liegt neben den Bewertungen auf GitHub Pages, Änderungen daran lösen die Action aus. Details siehe `magazin-notenrechner/README.md`.
+`magazin-notenrechner/` enthält die Quellen des Fachnoten-Rechners im Magazinbeitrag [/magazin/notenrechner](https://www.onmathe.de/magazin/notenrechner). Die fertige Datei `public/notenrechner/notenrechner.js` liegt neben den Bewertungen auf GitHub Pages, Änderungen daran lösen die Action aus. Details siehe `magazin-notenrechner/README.md`.
 
 ## Blog-Sicherung
 
