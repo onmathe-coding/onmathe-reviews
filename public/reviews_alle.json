@@ -1,8 +1,15 @@
 {
   "rating": 4.9,
-  "total": 139,
-  "updated": "2026-11-12T23:33:31.935Z",
+  "total": 140,
+  "updated": "2026-11-17T20:50:45.114Z",
   "reviews": [
+    {
+      "author_name": "Stella Pein",
+      "author_url": "https://www.google.com/maps/contrib/110867239961823887279/reviews",
+      "rating": 5,
+      "text": "",
+      "time": 1794939982
+    },
     {
       "author_name": "Eddy Mertens",
       "author_url": "https://www.google.com/maps/contrib/109915781273752055915/reviews",
