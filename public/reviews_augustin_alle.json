@@ -1,10 +1,17 @@
 {
   "rating": 5,
-  "total": 67,
-  "updated": "2026-11-07T19:02:22.854Z",
+  "total": 68,
+  "updated": "2026-11-18T20:27:00.787Z",
   "standort": "Augustin Heidenheim",
   "place_id": "ChIJn-0Q_3QWmUcRj9nsBrp6IVA",
   "reviews": [
+    {
+      "author_name": "B N",
+      "author_url": "https://www.google.com/maps/contrib/111358649984121278166/reviews",
+      "rating": 5,
+      "text": "Absolute Empfehlung\nWir sind rundum begeistert und unglaublich froh, mit Frau Brüssel eine so tolle Nachhilfelehrerin gefunden zu haben. Sie ist wirklich das Beste, was uns passieren konnte.\nFrau Brüssel geht ganz individuell auf unser Kind ein, erkennt seine Stärken und weiß genau, wie sie es fördern und motivieren kann. Durch ihren tollen Draht zu unserem Kind schafft sie es immer wieder, es genau dort abzuholen, wo es geradesteht. Dabei vermittelt sie nicht nur Wissen, sondern auch Freude am Lernen und Selbstvertrauen.\nBesonders schätzen wir ihre Flexibilität: Ob Englisch, Französisch oder Deutsch, Frau Brüssel kann spontan auf aktuelle schulische Themen, anstehende Klassenarbeiten oder individuelle Schwierigkeiten eingehen. Sie gestaltet die Nachhilfe so, wie unser Kind sie gerade braucht, und stärkt dabei auch seine Eigenverantwortung für das Lernen.\nIhr liegen die Kinder und Jugendlichen sowie ihre Entwicklung wirklich am Herzen.\nFür uns ist diese individuelle und persönliche Förderung jeden Cent wert.\nWir können die Nachhilfe uneingeschränkt weiterempfehlen, da einfach alles rund läuft von der Organisation über die Terminvereinbarung und Abrechnung bis hin zu den hervorragenden Nachhilfestunden selbst.",
+      "time": 1794988548
+    },
     {
       "author_name": "Valerie Frolow",
       "author_url": "https://www.google.com/maps/contrib/110558688949202988996/reviews",
@@ -32,13 +39,6 @@
       "rating": 5,
       "text": "Ich bin jetzt schon seit der siebten Klasse beim Augustin in Heidenheim. Von Anfang an wurde ich herzlich aufgenommen und toll unterstützt. Die Lücken, die ich mir über die Jahre angesammelt hatte, konnten erfolgreich gefüllt werden, sodass ich jetzt im Mathematik-Leistungskurs 13 NP erreichen konnte.",
       "time": 1772541072
-    },
-    {
-      "author_name": "Pamela Bähr",
-      "author_url": "https://www.google.com/maps/contrib/103497553084413776628/reviews",
-      "rating": 5,
-      "text": "Waren/ sind mit der Unterstützung durch augustin im Fach Mathe super zufrieden. Vielen Dank!",
-      "time": 1770142211
     },
     {
       "author_name": "Sonia Nicolae",
