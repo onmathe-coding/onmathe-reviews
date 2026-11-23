@@ -1,8 +1,22 @@
 {
   "rating": 4.9,
-  "total": 140,
-  "updated": "2026-11-17T20:50:45.114Z",
+  "total": 142,
+  "updated": "2026-11-23T23:48:42.967Z",
   "reviews": [
+    {
+      "author_name": "Markus Buck",
+      "author_url": "https://www.google.com/maps/contrib/118042433121381353529/reviews",
+      "rating": 5,
+      "text": "Sehr freundlich und kompetent. Man geht auf individuelle Anliegen ein und findet immer eine passende Lösung. Absolut empfehlenswert!",
+      "time": 1795463313
+    },
+    {
+      "author_name": "Alba Pein",
+      "author_url": "https://www.google.com/maps/contrib/117703431401137566745/reviews",
+      "rating": 5,
+      "text": "Ich habe jetzt seit paar wochen nachhilfe bei vivien und es hat mir sehr geholfen",
+      "time": 1795428776
+    },
     {
       "author_name": "Stella Pein",
       "author_url": "https://www.google.com/maps/contrib/110867239961823887279/reviews",
@@ -23,13 +37,6 @@
       "rating": 5,
       "text": "Für mich ist meine Nachhilfelehrerin sehr gut im erklären, weil sie alles so verständlich darstellt🦋 Ich konnte alles Schritt für Schritt mit ihr durchgehen und sie hat die wichtigen Regeln/Bemerkungen daneben geschrieben. Ich bin zwar oft langsam im verstehen, das liegt in diesem Fall aber an mir.",
       "time": 1794123747
-    },
-    {
-      "author_name": "Ute Mertens",
-      "author_url": "https://www.google.com/maps/contrib/111601415178287652550/reviews",
-      "rating": 4,
-      "text": "Der Unterricht ist gut aufgebaut und hilft meinem Sohn sich in Mathe zu verbessern. Sein Lehrer Laurin erklärt alles sehr gut und ist auch flexibel darin, Lehrmethoden anzupassen. Wir sind sehr zufrieden.",
-      "time": 1793820625
     },
     {
       "author_name": "Dijana Z.",
